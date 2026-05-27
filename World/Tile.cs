@@ -20,6 +20,4 @@ public class Tile
         X = x;
         Y = y;
     }
-
-
 }

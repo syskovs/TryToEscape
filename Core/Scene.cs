@@ -13,6 +13,12 @@ public class Scene
         _entities.Add(entity);
     }
 
+    public virtual void PreUpdate(GameTime gameTime)
+    {
+        foreach (var e in _entities)
+            e.PreUpdate(gameTime);
+    }
+    
     public virtual void Update(GameTime gameTime)
     {
         foreach (var e in _entities)

@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using TryToEscape.Core;
+using TryToEscape.Rendering;
 using TryToEscape.Scenes;
 
 namespace TryToEscape;
@@ -36,6 +38,7 @@ public class Game1 : Game
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
             Exit();
 
+        _sceneManager.PreUpdate(gameTime);
         _sceneManager.Update(gameTime);
 
         base.Update(gameTime);

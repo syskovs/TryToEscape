@@ -17,6 +17,11 @@ public class SceneManager
         _currentScene = scene;
     }
 
+    public void PreUpdate(GameTime gameTime)
+    {
+        _currentScene.PreUpdate(gameTime);
+    }
+
     public void Update(GameTime gameTime)
     {
         _currentScene.Update(gameTime);

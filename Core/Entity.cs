@@ -23,6 +23,11 @@ public class Entity
 
         return default;
     }
+    public void PreUpdate(GameTime gameTime)
+    {
+        foreach (var c in _components)
+            c.PreUpdate(gameTime);
+    }
 
     public void Update(GameTime gameTime)
     {

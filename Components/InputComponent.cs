@@ -7,6 +7,7 @@ namespace TryToEscape.Components;
 public class InputComponent : Component
 {
     private float _speed;
+    public Vector2 PreviousPosition { get; private set; }
 
     public InputComponent(float speed)
     {
@@ -15,6 +16,8 @@ public class InputComponent : Component
 
     public override void Update(GameTime gameTime)
     {
+        PreviousPosition = Owner.Position;
+
         var keyboard = Keyboard.GetState();
         var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 

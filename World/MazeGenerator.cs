@@ -12,6 +12,10 @@ public class MazeGenerator
 
     public Maze Generate(int width, int height, int minSize, int minRoomSize, int padding)
     {
+        if (minSize - padding * 2 < minRoomSize + 1)
+            throw new ArgumentException(
+                "Комнаты не поместятся: увеличь minSize или уменьши padding/minRoomSize");
+
         _minSize = minSize;
         _padding = padding;
         _minRoomSize = minRoomSize;
@@ -101,13 +105,13 @@ public class MazeGenerator
 
     private void CarveHorizontalCorridor(int y, int fromX, int toX, Maze maze)
     {
-        for (var x = fromX; x < toX; x++)
+        for (var x = fromX; x <= toX; x++)
             maze.SetTile(x, y, new Tile(Tile.TileType.Floor, x, y));
     }
 
     private void CarveVerticalCorridor(int x, int fromY, int toY, Maze maze)
     {
-        for (var y = fromY; y < toY; y++)
+        for (var y = fromY; y <= toY; y++)
             maze.SetTile(x, y, new Tile(Tile.TileType.Floor, x, y));
     }
 

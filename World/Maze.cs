@@ -12,10 +12,16 @@ public class Maze
 
         Width = width;
         Height = height;
+
+        for (var x = 0; x < width; x++)
+            for (var y = 0; y < height; y++)
+                SetTile(x, y, new Tile(Tile.TileType.Wall, x, y));
     }
 
-    public Tile GetTile(int x, int y)
+    public Tile GetTile(int x, int y) => _tiles[x, y];
+
+    public void SetTile(int x, int y, Tile tile)
     {
-        return _tiles[x, y];
+        _tiles[x, y] = tile;
     }
 }

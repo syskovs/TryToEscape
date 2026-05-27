@@ -10,10 +10,17 @@ public class GameScene : Scene
 {
     public GameScene(ContentManager contentManager)
     {
-        var texture = contentManager.Load<Texture2D>("assets/background");
+        var background = contentManager.Load<Texture2D>("assets/background");
+        var sprite = contentManager.Load<Texture2D>("assets/sprite");
 
-        var entity = new Entity();
-        entity.AddComponent(new SpriteComponent(texture));
-        AddEntity(entity);
+        var backgroundEntity = new Entity();
+        backgroundEntity.AddComponent(new SpriteComponent(background));
+        AddEntity(backgroundEntity);
+
+        var spriteEntity = new Entity();
+        spriteEntity.AddComponent(new SpriteComponent(sprite));
+        spriteEntity.AddComponent(new InputComponent(100));
+        AddEntity(spriteEntity);
+
     }
 }

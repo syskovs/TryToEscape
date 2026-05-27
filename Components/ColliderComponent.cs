@@ -10,6 +10,7 @@ public class ColliderComponent : Component
     private Maze _maze;
     private int _size;
     private int _tileSize;
+    private Vector2 _previousPosition;
 
     public ColliderComponent(Maze maze, int size, int tileSize)
     {
@@ -18,19 +19,27 @@ public class ColliderComponent : Component
         _tileSize = tileSize;
     }
 
+    public override void PreUpdate(GameTime gameTime)
+    {
+        _previousPosition = Owner.Position;
+    }
+
     public override void Update(GameTime gameTime)
     {
-        var x = (int)(Owner.Position.X / _tileSize);
-        var y = (int)(Owner.Position.Y / _tileSize);
+        var x = Owner.Position.X;
+        var y = Owner.Position.Y;
 
+        if (IsWallAt(x, y) || IsWallAt(x + _size - 1, y) ||
+            IsWallAt(x, y + _size - 1) || IsWallAt(x + _size - 1, y + _size - 1))
+            Owner.Position = _previousPosition;
+    }
+
+    private bool IsWallAt(float px, float py)
+    {
+        var x = (int)(px / _tileSize);
+        var y = (int)(py / _tileSize);
         var tile = _maze.GetTile(x, y);
 
-        if (tile.Type == Tile.TileType.Wall)
-        {
-            x -= _size;
-            y -= _size;
-        }
-
-        base.Update(gameTime);
+        return tile.Type == Tile.TileType.Wall;
     }
 }

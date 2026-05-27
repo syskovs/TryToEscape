@@ -18,7 +18,13 @@ public class Maze
                 SetTile(x, y, new Tile(Tile.TileType.Wall, x, y));
     }
 
-    public Tile GetTile(int x, int y) => _tiles[x, y];
+    public Tile GetTile(int x, int y)
+    {
+        if (x < 0 || x >= Width || y < 0 || y >= Height)
+            return new Tile(Tile.TileType.Wall, x, y);
+
+        return _tiles[x, y];
+    }
 
     public void SetTile(int x, int y, Tile tile)
     {

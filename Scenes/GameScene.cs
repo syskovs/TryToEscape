@@ -21,14 +21,17 @@ public class GameScene : Scene
         // backgroundEntity.AddComponent(new SpriteComponent(background));
         // AddEntity(backgroundEntity);
 
+        var maze = new MazeGenerator().Generate(50, 30, 8, 4, 1);
+        
         var spriteEntity = new Entity();
         spriteEntity.AddComponent(new SpriteComponent(sprite));
         spriteEntity.AddComponent(new InputComponent(100));
+        spriteEntity.Position = new Vector2(5 * 16, 5 * 16);
+        spriteEntity.AddComponent(new ColliderComponent(maze, 16, 16));
         AddEntity(spriteEntity);
 
         var floorTexture = contentManager.Load<Texture2D>("assets/tiles/floor");
         var wallTexture  = contentManager.Load<Texture2D>("assets/tiles/wall");
-        var maze = new MazeGenerator().Generate(50, 30, 8, 4, 1);
         _mazeRenderer = new MazeRenderer(maze, floorTexture, wallTexture, 16);
     }
 

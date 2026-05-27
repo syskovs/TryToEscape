@@ -7,6 +7,8 @@ public abstract class Component
 {
     public Entity Owner { get; internal set; }
 
+    public virtual void PreUpdate(GameTime gameTime) { }
+    
     public virtual void Update(GameTime gameTime) {}
 
     public virtual void Draw(SpriteBatch spriteBatch) {}

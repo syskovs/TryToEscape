@@ -106,13 +106,19 @@ public class MazeGenerator
     private void CarveHorizontalCorridor(int y, int fromX, int toX, Maze maze)
     {
         for (var x = fromX; x <= toX; x++)
+        {
             maze.SetTile(x, y, new Tile(Tile.TileType.Floor, x, y));
+            maze.SetTile(x, y + 1, new Tile(Tile.TileType.Floor, x, y + 1));
+        }
     }
 
     private void CarveVerticalCorridor(int x, int fromY, int toY, Maze maze)
     {
         for (var y = fromY; y <= toY; y++)
+        {
             maze.SetTile(x, y, new Tile(Tile.TileType.Floor, x, y));
+            maze.SetTile(x + 1, y, new Tile(Tile.TileType.Floor, x + 1, y));
+        }
     }
 
     private void CarveRoom(Rectangle room, Maze maze)

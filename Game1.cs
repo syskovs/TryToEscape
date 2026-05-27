@@ -22,7 +22,7 @@ public class Game1 : Game
     protected override void Initialize()
     {
         // TODO: Add your initialization logic here
-        _sceneManager = new SceneManager(new MenuScene());
+        _sceneManager = new SceneManager(new GameScene(Content));
         base.Initialize();
     }
 

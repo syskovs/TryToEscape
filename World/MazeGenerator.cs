@@ -60,20 +60,62 @@ public class MazeGenerator
         var roomWidth = _rng.Next(_minRoomSize, maxWidth);
         var roomHeight = _rng.Next(_minRoomSize, maxHeight);
 
-        var roomX = _rng.Next(node.Area.X + _padding, node.Area.X + node.Area.Width - roomWidth - _padding);
-        var roomY = _rng.Next(node.Area.Y + _padding, node.Area.Y + node.Area.Height - roomHeight - _padding);
+        var roomOriginX = _rng.Next(node.Area.X + _padding, node.Area.X + node.Area.Width - roomWidth - _padding);
+        var roomOriginY = _rng.Next(node.Area.Y + _padding, node.Area.Y + node.Area.Height - roomHeight - _padding);
 
-        node.Room = new Rectangle(roomX, roomY, roomWidth, roomHeight);
-
-        for (var x = roomX; x < roomX + roomWidth; x++)
-            for (var y = roomY; y < roomY + roomHeight; y++)
-                maze.SetTile(x, y, new Tile(Tile.TileType.Floor, x, y));
-
+        node.Room = new Rectangle(roomOriginX, roomOriginY, roomWidth, roomHeight);
+        CarveRoom(node.Room.Value, maze);
     }
 
     private void ConnectRooms(BSPNode node, Maze maze)
     {
+        if (node.Left == null || node.Right == null) return;
+
+        ConnectRooms(node.Left, maze);
+        ConnectRooms(node.Right, maze);
+
+        var roomA = GetRoom(node.Left);
+        var roomB = GetRoom(node.Right);
+
+        if (roomA == null || roomB == null) return;
+
+        var roomACenter = roomA.Value.Center;
+        var roomBCenter = roomB.Value.Center;
+
+        var corridorStartX = Math.Min(roomACenter.X, roomBCenter.X);
+        var corridorEndX = Math.Max(roomACenter.X, roomBCenter.X);
+        var corridorStartY = Math.Min(roomACenter.Y, roomBCenter.Y);
+        var corridorEndY = Math.Max(roomACenter.Y, roomBCenter.Y);
+
+        CarveHorizontalCorridor(roomACenter.Y, corridorStartX, corridorEndX, maze);
+        CarveVerticalCorridor(roomBCenter.X, corridorStartY, corridorEndY, maze);
+    }
+
+    private Rectangle? GetRoom(BSPNode node)
+    {
+        if (node.Room != null)
+            return node.Room;
         
+        return GetRoom(node.Left) ?? GetRoom(node.Right);
+    }
+
+    private void CarveHorizontalCorridor(int y, int fromX, int toX, Maze maze)
+    {
+        for (var x = fromX; x < toX; x++)
+            maze.SetTile(x, y, new Tile(Tile.TileType.Floor, x, y));
+    }
+
+    private void CarveVerticalCorridor(int x, int fromY, int toY, Maze maze)
+    {
+        for (var y = fromY; y < toY; y++)
+            maze.SetTile(x, y, new Tile(Tile.TileType.Floor, x, y));
+    }
+
+    private void CarveRoom(Rectangle room, Maze maze)
+    {
+        for (var x = room.X; x < room.X + room.Width; x++)
+            for (var y = room.Y; y < room.Y + room.Height; y++)
+                maze.SetTile(x, y, new Tile(Tile.TileType.Floor, x, y));
     }
 
     private bool CanSplit(BSPNode node)

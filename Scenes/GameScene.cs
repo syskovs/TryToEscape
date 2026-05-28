@@ -11,6 +11,7 @@ namespace TryToEscape.Scenes;
 public class GameScene : Scene
 {
     private MazeRenderer _mazeRenderer;
+    private FogOfWarRenderer _fogRenderer;
     private Camera _camera;
     private Entity _spriteEntity;
     private const int TileSize = 16;
@@ -19,17 +20,26 @@ public class GameScene : Scene
     public GameScene(ContentManager contentManager, GraphicsDevice graphicsDevice)
     {
         _camera = new Camera(graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height);
+
         var sprite = contentManager.Load<Texture2D>("assets/sprite");
+
         var generator = new MazeGenerator();
         var maze = generator.Generate(50, 30, 8, 4, 1);
         var start = generator.GetStartPosition();
         var end = generator.GetEndPosition();
+
+        var fog = new FogOfWar(maze);
+        var pixel = new Texture2D(graphicsDevice, 1, 1);
+        pixel.SetData(new[] { Color.White });
+        _fogRenderer = new FogOfWarRenderer(fog, pixel, TileSize);
+
         
         _spriteEntity = new Entity();
         _spriteEntity.AddComponent(new SpriteComponent(sprite));
         _spriteEntity.AddComponent(new InputComponent(100));
         _spriteEntity.Position = new Vector2(start.X * TileSize, start.Y * TileSize);
         _spriteEntity.AddComponent(new ColliderComponent(maze, TileSize, TileSize));
+        _spriteEntity.AddComponent(new FogOfWarUpdaterComponent(fog, TileSize, 2));
         AddEntity(_spriteEntity);
 
         var floorTexture = contentManager.Load<Texture2D>("assets/tiles/floor");
@@ -51,6 +61,7 @@ public class GameScene : Scene
     public override void Draw(SpriteBatch spriteBatch)
     {   
         _mazeRenderer.Draw(spriteBatch);
+        _fogRenderer.Draw(spriteBatch);
         base.Draw(spriteBatch);
     }
 }

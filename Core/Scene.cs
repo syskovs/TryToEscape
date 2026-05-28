@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using TryToEscape.Rendering;
 
 namespace TryToEscape.Core;
 
@@ -11,6 +12,11 @@ public class Scene
     public void AddEntity(Entity entity)
     {
         _entities.Add(entity);
+    }
+
+    public virtual Matrix GetCameraMatrix()
+    {
+        return Matrix.Identity;
     }
 
     public virtual void PreUpdate(GameTime gameTime)

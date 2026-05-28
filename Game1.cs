@@ -24,7 +24,7 @@ public class Game1 : Game
     protected override void Initialize()
     {
         // TODO: Add your initialization logic here
-        _sceneManager = new SceneManager(new GameScene(Content));
+        _sceneManager = new SceneManager(new GameScene(Content, GraphicsDevice));
         base.Initialize();
     }
 
@@ -48,7 +48,7 @@ public class Game1 : Game
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
         
-        _spriteBatch.Begin();
+        _spriteBatch.Begin(transformMatrix: _sceneManager.GetCameraMatrix());
         _sceneManager.Draw(_spriteBatch);
         _spriteBatch.End();
 

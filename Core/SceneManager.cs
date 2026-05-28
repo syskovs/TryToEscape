@@ -12,6 +12,11 @@ public class SceneManager
         _currentScene = scene;
     }
 
+    public Matrix GetCameraMatrix()
+    {
+        return _currentScene.GetCameraMatrix();
+    }
+
     public void ChangeScene(Scene scene)
     {
         _currentScene = scene;

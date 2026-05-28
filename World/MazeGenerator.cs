@@ -9,6 +9,7 @@ public class MazeGenerator
     private int _padding;
     private int _minSize;
     private int _minRoomSize;
+    private BSPNode _root;
 
     public Maze Generate(int width, int height, int minSize, int minRoomSize, int padding)
     {
@@ -22,12 +23,48 @@ public class MazeGenerator
 
         var maze = new Maze(width, height);
         var node = new BSPNode(new Rectangle(0, 0, maze.Width, maze.Height));
+        _root = node;
 
         Split(node);
         CreateRooms(node, maze);
         ConnectRooms(node, maze);
 
         return maze;
+    }
+
+    public Vector2 GetStartPosition()
+    {
+        var node = GetLeftmostLeaf(_root);
+        var vector = new Vector2(node.Room.Value.Center.X, node.Room.Value.Center.Y);
+
+        return vector;
+    }
+
+    public Vector2 GetEndPosition()
+    {
+        var node = GetExitLeaf(_root);
+        var vector = new Vector2(node.Room.Value.Center.X, node.Room.Value.Center.Y);
+
+        return vector;
+    }
+
+    private BSPNode GetLeftmostLeaf(BSPNode node)
+    {
+        if (IsLeaf(node))
+            return node;
+        
+        return GetLeftmostLeaf(node.Left);
+    }
+
+    private BSPNode GetExitLeaf(BSPNode node)
+    {
+        if (IsLeaf(node))
+            return node;
+
+        var next = _rng.Next(0, 2) == 0 ? node.Right.Left : node.Right.Right;
+        if (next == null) return node.Right;
+            return GetExitLeaf(next);
+
     }
 
     private void Split(BSPNode node)
@@ -49,7 +86,7 @@ public class MazeGenerator
 
     private void CreateRooms(BSPNode node, Maze maze)
     {
-        if (node.Left != null || node.Right != null)
+        if (!IsLeaf(node))
         {
             CreateRooms(node.Left, maze);
             CreateRooms(node.Right, maze);
@@ -71,9 +108,14 @@ public class MazeGenerator
         CarveRoom(node.Room.Value, maze);
     }
 
+    private bool IsLeaf(BSPNode node)
+    {
+        return node.Left == null && node.Right == null;
+    }
+
     private void ConnectRooms(BSPNode node, Maze maze)
     {
-        if (node.Left == null || node.Right == null) return;
+        if (IsLeaf(node)) return;
 
         ConnectRooms(node.Left, maze);
         ConnectRooms(node.Right, maze);

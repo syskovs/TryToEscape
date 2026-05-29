@@ -25,4 +25,14 @@ public class Camera
         return Matrix.CreateTranslation(-_position.X + _width / 2, -_position.Y + _height / 2, 0);
     }
 
+    public Rectangle GetVisibleArea()
+    {
+        return new Rectangle(
+            (int)(_position.X - _width  / 2f),
+            (int)(_position.Y - _height / 2f),
+            _width,
+            _height
+        );
+    }
+
 }

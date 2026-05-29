@@ -19,8 +19,8 @@ public class FogOfWarUpdaterComponent : Component
 
     public override void Update(GameTime gameTime)
     {
-        var x = (int)(Owner.Position.X / _tileSize);
-        var y = (int)(Owner.Position.Y / _tileSize);
+        var x = (int)((Owner.Position.X + _tileSize / 2f) / _tileSize);
+        var y = (int)((Owner.Position.Y + _tileSize / 2f) / _tileSize);
 
         _fog.UpdateFrom(x, y, _radius);
     }

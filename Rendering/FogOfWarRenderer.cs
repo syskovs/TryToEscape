@@ -18,10 +18,12 @@ public class FogOfWarRenderer
         _tileSize = tileSize;
     }
 
-    public void Draw(SpriteBatch spriteBatch)
+    public void Draw(SpriteBatch spriteBatch, Rectangle visibleArea)
     {
-        for (var x = 0; x < _fog.Width; x++)
-            for (var y = 0; y < _fog.Height; y++)
+        var bounds = TileBounds.FromVisibleArea(visibleArea, _tileSize, _fog.Width, _fog.Height);
+
+        for (var x = bounds.Left; x < bounds.Right; x++)
+            for (var y = bounds.Top; y < bounds.Bottom; y++)
             {
                 var state = _fog.GetState(x, y);
                 

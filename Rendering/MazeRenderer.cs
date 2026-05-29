@@ -1,4 +1,3 @@
-using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TryToEscape.World;
@@ -20,14 +19,14 @@ public class MazeRenderer
         _tileSize = tileSize;
     }
 
-    public void Draw(SpriteBatch spriteBatch)
+    public void Draw(SpriteBatch spriteBatch, Rectangle visibleArea)
     {
-        for (var x = 0; x < _maze.Width; x++)
-            for (var y = 0; y < _maze.Height; y++)
+        var bounds = TileBounds.FromVisibleArea(visibleArea, _tileSize, _maze.Width, _maze.Height);
+
+        for (var x = bounds.Left; x < bounds.Right; x++)
+            for (var y = bounds.Top; y < bounds.Bottom; y++)
             {
                 var tile = _maze.GetTile(x ,y);
-                var vector2 = new Vector2(x * _tileSize, y * _tileSize);
-                var color = Color.White;
 
                 if (tile.Type == Tile.TileType.Floor)
                     spriteBatch.Draw(_floor, new Rectangle(x * _tileSize, y * _tileSize, _tileSize, _tileSize), Color.White);

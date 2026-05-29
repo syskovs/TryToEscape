@@ -9,14 +9,16 @@ public class MazeRenderer
     private Maze _maze;
     private Texture2D _floor;
     private Texture2D _wall;
+    private Texture2D _exit;
     private int _tileSize;
 
-    public MazeRenderer(Maze maze, Texture2D floor, Texture2D wall, int tileSize)
+    public MazeRenderer(Maze maze, Texture2D floor, Texture2D wall, Texture2D exit, int tileSize)
     {
         _maze = maze;
         _floor = floor;
         _wall = wall;
         _tileSize = tileSize;
+        _exit = exit;
     }
 
     public void Draw(SpriteBatch spriteBatch, Rectangle visibleArea)
@@ -32,6 +34,8 @@ public class MazeRenderer
                     spriteBatch.Draw(_floor, new Rectangle(x * _tileSize, y * _tileSize, _tileSize, _tileSize), Color.White);
                 else if (tile.Type == Tile.TileType.Wall)
                     spriteBatch.Draw(_wall, new Rectangle(x * _tileSize, y * _tileSize, _tileSize, _tileSize), Color.White);
+                else if (tile.Type == Tile.TileType.Exit)
+                    spriteBatch.Draw(_exit, new Rectangle(x * _tileSize, y * _tileSize, _tileSize, _tileSize), Color.White);
             }
     }
 }

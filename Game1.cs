@@ -24,7 +24,8 @@ public class Game1 : Game
     protected override void Initialize()
     {
         // TODO: Add your initialization logic here
-        _sceneManager = new SceneManager(new GameScene(Content, GraphicsDevice));
+        _sceneManager = new SceneManager();
+        _sceneManager.ChangeScene(new GameScene(Content, GraphicsDevice, _sceneManager));
         base.Initialize();
     }
 

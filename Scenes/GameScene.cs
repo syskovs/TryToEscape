@@ -13,38 +13,49 @@ public class GameScene : Scene
     private MazeRenderer _mazeRenderer;
     private FogOfWarRenderer _fogRenderer;
     private Camera _camera;
-    private Entity _spriteEntity;
+    private Entity _player;
+    private SceneManager _sceneManager;
     private const int TileSize = 16;
     
 
-    public GameScene(ContentManager contentManager, GraphicsDevice graphicsDevice)
+    public GameScene(ContentManager contentManager, GraphicsDevice graphicsDevice, SceneManager sceneManager)
     {
-        _camera = new Camera(graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height);
 
-        var sprite = contentManager.Load<Texture2D>("assets/sprite");
+        _camera = new Camera(graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height);
+        _sceneManager = sceneManager;
+
+        var playerSprite = contentManager.Load<Texture2D>("assets/sprite");
+        var keySprite = contentManager.Load<Texture2D>("assets/key");
 
         var generator = new MazeGenerator();
         var maze = generator.Generate(50, 30, 8, 4, 1);
         var start = generator.GetStartPosition();
-        var end = generator.GetEndPosition();
 
         var fog = new FogOfWar(maze);
         var pixel = new Texture2D(graphicsDevice, 1, 1);
         pixel.SetData(new[] { Color.White });
         _fogRenderer = new FogOfWarRenderer(fog, pixel, TileSize);
-
         
-        _spriteEntity = new Entity();
-        _spriteEntity.AddComponent(new SpriteComponent(sprite));
-        _spriteEntity.AddComponent(new InputComponent(100));
-        _spriteEntity.Position = new Vector2(start.X * TileSize, start.Y * TileSize);
-        _spriteEntity.AddComponent(new ColliderComponent(maze, TileSize, TileSize));
-        _spriteEntity.AddComponent(new FogOfWarUpdaterComponent(fog, TileSize, 4));
-        AddEntity(_spriteEntity);
+        _player = new Entity();
+        _player.AddComponent(new SpriteComponent(playerSprite));
+        _player.AddComponent(new InputComponent(100));
+        _player.Position = new Vector2(start.X * TileSize, start.Y * TileSize);
+        _player.AddComponent(new ColliderComponent(maze, TileSize, TileSize));
+        _player.AddComponent(new FogOfWarUpdaterComponent(fog, TileSize, 30));
+        _player.AddComponent(new InventoryComponent()); 
+        _player.AddComponent(new ExitDetectorComponent(maze, TileSize, () => _sceneManager.ChangeScene(new MenuScene())));
+        AddEntity(_player);
+
+        var key = new Entity();
+        key.AddComponent(new SpriteComponent(keySprite));
+        key.Position = new Vector2(maze.Width / 2 * TileSize, maze.Height / 2 * TileSize);
+        key.AddComponent(new KeyComponent(_player, this, TileSize));
+        AddEntity(key);
 
         var floorTexture = contentManager.Load<Texture2D>("assets/tiles/floor");
         var wallTexture  = contentManager.Load<Texture2D>("assets/tiles/wall");
-        _mazeRenderer = new MazeRenderer(maze, floorTexture, wallTexture, TileSize);
+        var exitTexture = contentManager.Load<Texture2D>("assets/tiles/exit");
+        _mazeRenderer = new MazeRenderer(maze, floorTexture, wallTexture, exitTexture, TileSize);
     }
 
     public override Matrix GetCameraMatrix()
@@ -54,7 +65,7 @@ public class GameScene : Scene
 
     public override void Update(GameTime gameTime)
     {
-        _camera.Follow(_spriteEntity.Position);
+        _camera.Follow(_player.Position);
         base.Update(gameTime);
     }
 

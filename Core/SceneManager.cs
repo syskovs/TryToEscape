@@ -7,10 +7,7 @@ public class SceneManager
 {
     Scene _currentScene;
 
-    public SceneManager(Scene scene)
-    {
-        _currentScene = scene;
-    }
+    public SceneManager() {}
 
     public Matrix GetCameraMatrix()
     {

@@ -29,6 +29,9 @@ public class MazeGenerator
         CreateRooms(node, maze);
         ConnectRooms(node, maze);
 
+        var endPos = GetEndPosition();
+        maze.GetTile((int)endPos.X, (int)endPos.Y).Type = Tile.TileType.Exit;
+
         return maze;
     }
 

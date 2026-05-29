@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 
 namespace TryToEscape.World;
@@ -10,6 +11,7 @@ public class MazeGenerator
     private int _minSize;
     private int _minRoomSize;
     private BSPNode _root;
+    private List<BSPNode> _leaves;
 
     public Maze Generate(int width, int height, int minSize, int minRoomSize, int padding)
     {
@@ -17,6 +19,7 @@ public class MazeGenerator
             throw new ArgumentException(
                 "Комнаты не поместятся: увеличь minSize или уменьши padding/minRoomSize");
 
+        _leaves = new();
         _minSize = minSize;
         _padding = padding;
         _minRoomSize = minRoomSize;
@@ -33,6 +36,22 @@ public class MazeGenerator
         maze.GetTile((int)endPos.X, (int)endPos.Y).Type = Tile.TileType.Exit;
 
         return maze;
+    }
+
+    public Vector2 GetRandomFloorPosition()
+    {
+        var choice = _rng.Next(_leaves.Count);
+
+        var currentLeaf = _leaves[choice];
+        var startLeaf = GetLeftmostLeaf(_root);
+        var endLeaf = GetExitLeaf(_root);
+
+        if (currentLeaf == startLeaf || currentLeaf == endLeaf)
+            return GetRandomFloorPosition();
+
+        var room = currentLeaf.Room.Value;
+        
+        return new Vector2(room.Center.X, room.Center.Y);
     }
 
     public Vector2 GetStartPosition()
@@ -108,6 +127,7 @@ public class MazeGenerator
         var roomOriginY = _rng.Next(node.Area.Y + _padding, node.Area.Y + node.Area.Height - roomHeight - _padding);
 
         node.Room = new Rectangle(roomOriginX, roomOriginY, roomWidth, roomHeight);
+        _leaves.Add(node);
         CarveRoom(node.Room.Value, maze);
     }
 

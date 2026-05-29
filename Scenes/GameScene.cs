@@ -30,6 +30,7 @@ public class GameScene : Scene
         var generator = new MazeGenerator();
         var maze = generator.Generate(50, 30, 8, 4, 1);
         var start = generator.GetStartPosition();
+        var keyPos = generator.GetRandomFloorPosition();
 
         var fog = new FogOfWar(maze);
         var pixel = new Texture2D(graphicsDevice, 1, 1);
@@ -48,7 +49,7 @@ public class GameScene : Scene
 
         var key = new Entity();
         key.AddComponent(new SpriteComponent(keySprite));
-        key.Position = new Vector2(maze.Width / 2 * TileSize, maze.Height / 2 * TileSize);
+        key.Position = new Vector2(keyPos.X * TileSize, keyPos.Y * TileSize);
         key.AddComponent(new KeyComponent(_player, this, TileSize));
         AddEntity(key);
 

@@ -39,7 +39,7 @@ public class GameScene : Scene
         _spriteEntity.AddComponent(new InputComponent(100));
         _spriteEntity.Position = new Vector2(start.X * TileSize, start.Y * TileSize);
         _spriteEntity.AddComponent(new ColliderComponent(maze, TileSize, TileSize));
-        _spriteEntity.AddComponent(new FogOfWarUpdaterComponent(fog, TileSize, 2));
+        _spriteEntity.AddComponent(new FogOfWarUpdaterComponent(fog, TileSize, 4));
         AddEntity(_spriteEntity);
 
         var floorTexture = contentManager.Load<Texture2D>("assets/tiles/floor");
@@ -60,8 +60,9 @@ public class GameScene : Scene
 
     public override void Draw(SpriteBatch spriteBatch)
     {   
-        _mazeRenderer.Draw(spriteBatch);
-        _fogRenderer.Draw(spriteBatch);
+        var visibleArea = _camera.GetVisibleArea();
+        _mazeRenderer.Draw(spriteBatch, visibleArea);
+        _fogRenderer.Draw(spriteBatch, visibleArea);
         base.Draw(spriteBatch);
     }
 }

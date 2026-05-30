@@ -1,37 +1,51 @@
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Linq;
 
 namespace TryToEscape.Core;
 
 public class SceneManager
 {
-    Scene _currentScene;
+    private Stack<Scene> _scenes = new();
 
     public SceneManager() {}
 
-    public Matrix GetCameraMatrix()
-    {
-        return _currentScene.GetCameraMatrix();
-    }
-
-    public void ChangeScene(Scene scene)
-    {
-        _currentScene = scene;
-    }
-
     public void PreUpdate(GameTime gameTime)
     {
-        _currentScene.PreUpdate(gameTime);
+        if (_scenes.Count == 0) 
+            return;
+        
+        _scenes.Peek().PreUpdate(gameTime);
     }
 
     public void Update(GameTime gameTime)
     {
-        _currentScene.Update(gameTime);
+        if (_scenes.Count == 0) 
+            return;
+        
+        _scenes.Peek().Update(gameTime);
     }
 
     public void Draw(SpriteBatch spriteBatch)
     {
-        _currentScene.Draw(spriteBatch);
+        foreach (var s in _scenes.Reverse())
+            s.Draw(spriteBatch);
     }
 
+    public void Push(Scene scene) 
+    {
+        _scenes.Push(scene);
+    }
+
+    public void Pop()
+    {
+        _scenes.Pop();
+    }
+
+    public void Replace(Scene scene) 
+    {
+        _scenes.Clear();
+        _scenes.Push(scene);
+    }
 }

@@ -15,11 +15,6 @@ public class Scene
         _entities.Add(entity);
     }
 
-    public virtual Matrix GetCameraMatrix()
-    {
-        return Matrix.Identity;
-    }
-
     public virtual void PreUpdate(GameTime gameTime)
     {
         foreach (var e in _entities)

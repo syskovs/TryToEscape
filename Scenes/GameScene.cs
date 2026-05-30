@@ -14,13 +14,16 @@ public class GameScene : Scene
     private FogOfWarRenderer _fogRenderer;
     private Camera _camera;
     private Entity _player;
+    private ContentManager _content;
+    private GraphicsDevice _graphics;
     private SceneManager _sceneManager;
     private const int TileSize = 16;
     
 
     public GameScene(ContentManager contentManager, GraphicsDevice graphicsDevice, SceneManager sceneManager)
     {
-
+        _content = contentManager;
+        _graphics = graphicsDevice;
         _camera = new Camera(graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height);
         _sceneManager = sceneManager;
 
@@ -42,9 +45,10 @@ public class GameScene : Scene
         _player.AddComponent(new InputComponent(100));
         _player.Position = new Vector2(start.X * TileSize, start.Y * TileSize);
         _player.AddComponent(new ColliderComponent(maze, TileSize, TileSize));
-        _player.AddComponent(new FogOfWarUpdaterComponent(fog, TileSize, 30));
+        _player.AddComponent(new FogOfWarUpdaterComponent(fog, TileSize, 10));
         _player.AddComponent(new InventoryComponent()); 
-        _player.AddComponent(new ExitDetectorComponent(maze, TileSize, () => _sceneManager.ChangeScene(new MenuScene())));
+        _player.AddComponent(new ExitDetectorComponent(maze, TileSize, () => _sceneManager.Replace(new VictoryScene(_content, _graphics, _sceneManager))));
+        _player.AddComponent(new PauseTriggerComponent(() => _sceneManager.Push(new PauseScene(_content, _graphics, _sceneManager))));
         AddEntity(_player);
 
         var key = new Entity();
@@ -59,11 +63,6 @@ public class GameScene : Scene
         _mazeRenderer = new MazeRenderer(maze, floorTexture, wallTexture, exitTexture, TileSize);
     }
 
-    public override Matrix GetCameraMatrix()
-    {
-        return _camera.GetTransformMatrix();
-    }
-
     public override void Update(GameTime gameTime)
     {
         _camera.Follow(_player.Position);
@@ -72,9 +71,13 @@ public class GameScene : Scene
 
     public override void Draw(SpriteBatch spriteBatch)
     {   
+        spriteBatch.Begin(transformMatrix: _camera.GetTransformMatrix());
+    
         var visibleArea = _camera.GetVisibleArea();
         _mazeRenderer.Draw(spriteBatch, visibleArea);
         _fogRenderer.Draw(spriteBatch, visibleArea);
         base.Draw(spriteBatch);
+    
+        spriteBatch.End();
     }
 }

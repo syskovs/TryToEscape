@@ -25,7 +25,7 @@ public class Game1 : Game
     {
         // TODO: Add your initialization logic here
         _sceneManager = new SceneManager();
-        _sceneManager.ChangeScene(new GameScene(Content, GraphicsDevice, _sceneManager));
+        _sceneManager.Replace(new MenuScene(Content, GraphicsDevice, _sceneManager));
         base.Initialize();
     }
 
@@ -36,9 +36,6 @@ public class Game1 : Game
 
     protected override void Update(GameTime gameTime)
     {
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-            Exit();
-
         _sceneManager.PreUpdate(gameTime);
         _sceneManager.Update(gameTime);
 
@@ -48,11 +45,7 @@ public class Game1 : Game
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
-        
-        _spriteBatch.Begin(transformMatrix: _sceneManager.GetCameraMatrix());
         _sceneManager.Draw(_spriteBatch);
-        _spriteBatch.End();
-
         base.Draw(gameTime);
     }
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -18,6 +19,8 @@ public class GameScene : Scene
     private GraphicsDevice _graphics;
     private SceneManager _sceneManager;
     private const int TileSize = 16;
+    private const int PatrolCount = 3;
+    private const int WaypointsPerPatrol = 3;
     
 
     public GameScene(ContentManager contentManager, GraphicsDevice graphicsDevice, SceneManager sceneManager)
@@ -34,6 +37,8 @@ public class GameScene : Scene
         var maze = generator.Generate(50, 30, 8, 4, 1);
         var start = generator.GetStartPosition();
         var keyPos = generator.GetRandomFloorPosition();
+        var patrolPos = generator.GetRandomFloorPosition();
+        var patrolPos2 = generator.GetRandomFloorPosition();
 
         var fog = new FogOfWar(maze);
         var pixel = new Texture2D(graphicsDevice, 1, 1);
@@ -57,6 +62,26 @@ public class GameScene : Scene
         key.AddComponent(new KeyComponent(_player, this, TileSize));
         AddEntity(key);
 
+        var patrolSprite = contentManager.Load<Texture2D>("assets/sprite");
+
+        for (int i = 0; i < PatrolCount; i++)
+        {
+            var waypoints = new List<Point>();
+            for (int j = 0; j < WaypointsPerPatrol; j++)
+            {
+                var pos = generator.GetRandomFloorPosition();
+                waypoints.Add(new Point((int)pos.X, (int)pos.Y));
+            }
+
+            var patrol = new Entity();
+            patrol.AddComponent(new SpriteComponent(patrolSprite));
+            patrol.Position = new Vector2(waypoints[0].X * TileSize, waypoints[0].Y * TileSize);
+            patrol.AddComponent(new PatrolMovementComponent(maze, waypoints, TileSize, 60f));
+            patrol.AddComponent(new VisionComponent(
+                maze, _player, TileSize, 8, 30, 
+                () => _sceneManager.Replace(new DefeatScene(_content, _graphics, _sceneManager))));
+            AddEntity(patrol);
+        }
         var floorTexture = contentManager.Load<Texture2D>("assets/tiles/floor");
         var wallTexture  = contentManager.Load<Texture2D>("assets/tiles/wall");
         var exitTexture = contentManager.Load<Texture2D>("assets/tiles/exit");

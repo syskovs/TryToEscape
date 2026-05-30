@@ -38,7 +38,7 @@ public class MazeGenerator
         return maze;
     }
 
-    public Vector2 GetRandomFloorPosition()
+    public Point GetRandomFloorPosition()
     {
         var choice = _rng.Next(_leaves.Count);
 
@@ -51,7 +51,7 @@ public class MazeGenerator
 
         var room = currentLeaf.Room.Value;
         
-        return new Vector2(room.Center.X, room.Center.Y);
+        return new Point(room.Center.X, room.Center.Y);
     }
 
     public Vector2 GetStartPosition()
@@ -86,7 +86,6 @@ public class MazeGenerator
         var next = _rng.Next(0, 2) == 0 ? node.Right.Left : node.Right.Right;
         if (next == null) return node.Right;
             return GetExitLeaf(next);
-
     }
 
     private void Split(BSPNode node)

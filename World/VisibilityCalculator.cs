@@ -26,7 +26,7 @@ public static class VisibilityCalculator
         }
     }
 
-    private static bool HasLineOfSight(Maze maze, int fromX, int fromY, int toX, int toY)
+    public static bool HasLineOfSight(Maze maze, int fromX, int fromY, int toX, int toY)
     {
         var dx = Math.Abs(fromX - toX);
         var dy = Math.Abs(fromY - toY);

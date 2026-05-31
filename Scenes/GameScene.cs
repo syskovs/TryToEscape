@@ -14,14 +14,19 @@ public class GameScene : Scene
     private MazeRenderer _mazeRenderer;
     private FogOfWarRenderer _fogRenderer;
     private Camera _camera;
-    private Entity _player;
     private ContentManager _content;
     private GraphicsDevice _graphics;
     private SceneManager _sceneManager;
+    private Entity _player;
+    
     private const int TileSize = 16;
     private const int PatrolCount = 3;
     private const int WaypointsPerPatrol = 3;
-    
+    private const int PlayerSpeed = 100;
+    private const int FogRadius = 8;
+    private const int PatrolVisionRadius = 8;
+    private const int PatrolSpeed = 60;
+    private const int PatrolVisionAngle = 30;
 
     public GameScene(ContentManager contentManager, GraphicsDevice graphicsDevice, SceneManager sceneManager)
     {
@@ -30,62 +35,7 @@ public class GameScene : Scene
         _camera = new Camera(graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height);
         _sceneManager = sceneManager;
 
-        var playerSprite = contentManager.Load<Texture2D>("assets/sprite");
-        var keySprite = contentManager.Load<Texture2D>("assets/key");
-
-        var generator = new MazeGenerator();
-        var maze = generator.Generate(50, 30, 8, 4, 1);
-        var start = generator.GetStartPosition();
-        var keyPos = generator.GetRandomFloorPosition();
-        var patrolPos = generator.GetRandomFloorPosition();
-        var patrolPos2 = generator.GetRandomFloorPosition();
-
-        var fog = new FogOfWar(maze);
-        var pixel = new Texture2D(graphicsDevice, 1, 1);
-        pixel.SetData(new[] { Color.White });
-        _fogRenderer = new FogOfWarRenderer(fog, pixel, TileSize);
-        
-        _player = new Entity();
-        _player.AddComponent(new SpriteComponent(playerSprite));
-        _player.AddComponent(new InputComponent(100));
-        _player.Position = new Vector2(start.X * TileSize, start.Y * TileSize);
-        _player.AddComponent(new ColliderComponent(maze, TileSize, TileSize));
-        _player.AddComponent(new FogOfWarUpdaterComponent(fog, TileSize, 10));
-        _player.AddComponent(new InventoryComponent()); 
-        _player.AddComponent(new ExitDetectorComponent(maze, TileSize, () => _sceneManager.Replace(new VictoryScene(_content, _graphics, _sceneManager))));
-        _player.AddComponent(new PauseTriggerComponent(() => _sceneManager.Push(new PauseScene(_content, _graphics, _sceneManager))));
-        AddEntity(_player);
-
-        var key = new Entity();
-        key.AddComponent(new SpriteComponent(keySprite));
-        key.Position = new Vector2(keyPos.X * TileSize, keyPos.Y * TileSize);
-        key.AddComponent(new KeyComponent(_player, this, TileSize));
-        AddEntity(key);
-
-        var patrolSprite = contentManager.Load<Texture2D>("assets/sprite");
-
-        for (int i = 0; i < PatrolCount; i++)
-        {
-            var waypoints = new List<Point>();
-            for (int j = 0; j < WaypointsPerPatrol; j++)
-            {
-                var pos = generator.GetRandomFloorPosition();
-                waypoints.Add(new Point((int)pos.X, (int)pos.Y));
-            }
-
-            var patrol = new Entity();
-            patrol.AddComponent(new SpriteComponent(patrolSprite));
-            patrol.Position = new Vector2(waypoints[0].X * TileSize, waypoints[0].Y * TileSize);
-            patrol.AddComponent(new PatrolMovementComponent(maze, waypoints, TileSize, 60f));
-            patrol.AddComponent(new VisionComponent(
-                maze, _player, TileSize, 8, 30, 
-                () => _sceneManager.Replace(new DefeatScene(_content, _graphics, _sceneManager))));
-            AddEntity(patrol);
-        }
-        var floorTexture = contentManager.Load<Texture2D>("assets/tiles/floor");
-        var wallTexture  = contentManager.Load<Texture2D>("assets/tiles/wall");
-        var exitTexture = contentManager.Load<Texture2D>("assets/tiles/exit");
-        _mazeRenderer = new MazeRenderer(maze, floorTexture, wallTexture, exitTexture, TileSize);
+        InitializeScene();
     }
 
     public override void Update(GameTime gameTime)
@@ -104,5 +54,89 @@ public class GameScene : Scene
         base.Draw(spriteBatch);
     
         spriteBatch.End();
+    }
+
+    private void InitializeScene()
+    {
+        var generator = new MazeGenerator();
+        var maze = generator.Generate(50, 30, 8, 4, 1);
+        var fog = new FogOfWar(maze);
+
+        InitializeRenderers(maze, fog);
+        CreatePlayer(maze, generator, fog);
+        CreateKey(generator);
+        CreatePatrols(maze, generator);
+    }
+    private void InitializeRenderers(Maze maze, FogOfWar fog)
+    {
+        var pixel = new Texture2D(_graphics, 1, 1);
+        pixel.SetData(new[] { Color.White });
+
+        _fogRenderer = new FogOfWarRenderer(fog, pixel, TileSize);
+
+        var floorTexture = _content.Load<Texture2D>("assets/tiles/floor");
+        var wallTexture = _content.Load<Texture2D>("assets/tiles/wall");
+        var exitTexture = _content.Load<Texture2D>("assets/tiles/exit");
+
+        _mazeRenderer = new MazeRenderer(maze, floorTexture, wallTexture, exitTexture, TileSize);
+    }
+
+    private void CreatePlayer(Maze maze, MazeGenerator generator, FogOfWar fog)
+    {
+        var sprite = _content.Load<Texture2D>("assets/sprite");
+        var position = generator.GetStartPosition();
+        var player = new Entity();
+
+        player.AddComponent(new SpriteComponent(sprite));
+        player.AddComponent(new InputComponent(PlayerSpeed));
+        player.Position = position * TileSize;
+        player.AddComponent(new ColliderComponent(maze, TileSize, TileSize));
+        player.AddComponent(new FogOfWarUpdaterComponent(fog, TileSize, FogRadius));
+        player.AddComponent(new InventoryComponent()); 
+        player.AddComponent(new ExitDetectorComponent(maze, TileSize, () => _sceneManager.Replace(new VictoryScene(_content, _graphics, _sceneManager))));
+        player.AddComponent(new PauseTriggerComponent(() => _sceneManager.Push(new PauseScene(_content, _graphics, _sceneManager))));
+        AddEntity(player);
+        _player = player;
+    }
+
+    private Entity CreatePatrol(Maze maze, MazeGenerator generator)
+    {
+        var sprite = _content.Load<Texture2D>("assets/sprite");
+
+        var waypoints = new List<Point>();
+        for (int j = 0; j < WaypointsPerPatrol; j++)
+        {
+            var position = generator.GetRandomFloorPosition();
+            waypoints.Add(new Point(position.X, position.Y));
+        }
+        var patrol = new Entity();
+
+        patrol.AddComponent(new SpriteComponent(sprite));
+        patrol.Position = waypoints[0].ToPixel(TileSize);
+        patrol.AddComponent(new PatrolMovementComponent(maze,waypoints, TileSize, PatrolSpeed));
+        patrol.AddComponent(new VisionComponent(maze, _player, TileSize, PatrolVisionRadius, PatrolVisionAngle, () => _sceneManager.Replace(new DefeatScene(_content, _graphics, _sceneManager))));
+
+        return patrol;
+    }
+
+    private void CreatePatrols(Maze maze, MazeGenerator generator)
+    {
+        for (int i = 0; i < PatrolCount; i++)
+        {
+            AddEntity(CreatePatrol(maze, generator));
+        }
+    }
+
+    private void CreateKey(MazeGenerator generator)
+    {
+        var position = generator.GetRandomFloorPosition();
+        var sprite = _content.Load<Texture2D>("assets/key");
+        var key = new Entity();
+
+        key.AddComponent(new SpriteComponent(sprite));
+        key.Position = new Vector2(position.X * TileSize, position.Y * TileSize);
+        key.AddComponent(new KeyComponent(_player, this, TileSize));
+
+        AddEntity(key);
     }
 }

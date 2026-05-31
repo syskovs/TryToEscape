@@ -42,7 +42,7 @@ public class PatrolMovementComponent : Component
             _pathIndex = 0;
         }
 
-        var target = TileToPixelCenter(_currentPath[_pathIndex]);
+        var target = _currentPath[_pathIndex].ToPixel(_tileSize);
         MoveToward(target, dt);
         if (Owner.Position == target) _pathIndex++;
     }
@@ -72,7 +72,7 @@ public class PatrolMovementComponent : Component
 
     private void RecalculatePath()
     {
-        var fromTile = PixelToTile(Owner.Position);
+        var fromTile = Owner.Position.ToTile(_tileSize);
         var toTile = _waypoints[_waypointIndex];
         _currentPath = Pathfinder.FindPath(_maze, fromTile, toTile);
     }
@@ -93,18 +93,5 @@ public class PatrolMovementComponent : Component
             Owner.Position += direction * step;
             Facing = direction;
         }
-    }
-
-    private Vector2 TileToPixelCenter(Point tile) 
-    {
-        return new Vector2(tile.X * _tileSize, tile.Y * _tileSize);
-    }
-
-    private Point PixelToTile(Vector2 pixel) 
-    {
-        return new Point(
-            (int)(pixel.X / _tileSize),
-            (int)(pixel.Y / _tileSize)
-        );
     }
 }

@@ -11,7 +11,7 @@ public class VisionComponent : Component
     private Entity _player;
     private int _tileSize;
     private int _radius;
-    private float _halfAngleCos;   // косинус половины угла, посчитан в конструкторе
+    private float _halfAngleCos;
     private Action _onSpotted;
 
     public VisionComponent(Maze maze, Entity player, int tileSize, int radius, float halfAngleDegrees, Action onSpotted)
@@ -37,8 +37,8 @@ public class VisionComponent : Component
         var playerPos = _player.Position;
         var patrolPos = Owner.Position;
 
-        var patrolTile = new Point((int)(patrolPos.X / _tileSize), (int)(patrolPos.Y / _tileSize));
-        var playerTile = new Point((int)(playerPos.X / _tileSize), (int)(playerPos.Y / _tileSize));
+        var patrolTilePos = patrolPos.ToTileCentered(_tileSize);
+        var playerTilePos = playerPos.ToTileCentered(_tileSize);
 
         var toPlayer = playerPos - patrolPos;
         var distance = toPlayer.Length();
@@ -54,7 +54,7 @@ public class VisionComponent : Component
         var cos = Vector2.Dot(dirToPlayer, facing);
         if (cos < _halfAngleCos) return; 
 
-        if (!VisibilityCalculator.HasLineOfSight(_maze, playerTile.X, playerTile.Y, patrolTile.X, patrolTile.Y))
+        if (!VisibilityCalculator.HasLineOfSight(_maze, playerTilePos.X, playerTilePos.Y, patrolTilePos.X, patrolTilePos.Y))
             return;
 
         _onSpotted();

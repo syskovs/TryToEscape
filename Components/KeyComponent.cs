@@ -19,12 +19,10 @@ public class KeyComponent : Component
 
     public override void Update(GameTime gameTime)
     {
-        var playerTileX = (int)((_player.Position.X + _tileSize / 2f) / _tileSize);
-        var playerTileY =  (int)((_player.Position.Y + _tileSize / 2f) / _tileSize);
-        var keyTileX = (int)((Owner.Position.X + _tileSize / 2f) / _tileSize);
-        var keyTileY = (int)((Owner.Position.Y + _tileSize / 2f) / _tileSize);
+        var playerTilePos = _player.Position.ToTileCentered(_tileSize);
+        var keyTilePos = Owner.Position.ToTileCentered(_tileSize);
 
-        if (playerTileX == keyTileX && playerTileY == keyTileY)
+        if (playerTilePos == keyTilePos)
         {
             _player.GetComponent<InventoryComponent>().AddKey();
             _scene.RemoveEntity(Owner);

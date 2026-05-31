@@ -24,10 +24,9 @@ public class ExitDetectorComponent : Component
 
         if (inv == null || !inv.HasKey) return;
 
-        var x = (int)((Owner.Position.X + _tileSize / 2f) / _tileSize);
-        var y = (int)((Owner.Position.Y + _tileSize / 2f) / _tileSize);
+        var position = Owner.Position.ToTileCentered(_tileSize);
 
-        var tile =_maze.GetTile(x, y);
+        var tile =_maze.GetTile(position.X, position.Y);
 
         if (tile.Type == Tile.TileType.Exit)
             _onExit();

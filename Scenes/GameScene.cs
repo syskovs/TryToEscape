@@ -20,7 +20,7 @@ public class GameScene : Scene
     private Entity _player;
     
     private const int TileSize = 16;
-    private const int PatrolCount = 3;
+    private const int PatrolCount = 2;
     private const int WaypointsPerPatrol = 3;
     private const int PlayerSpeed = 100;
     private const int FogRadius = 8;
@@ -91,7 +91,7 @@ public class GameScene : Scene
         player.AddComponent(new InputComponent(PlayerSpeed));
         player.Position = position * TileSize;
         player.AddComponent(new ColliderComponent(maze, TileSize, TileSize));
-        player.AddComponent(new FogOfWarUpdaterComponent(fog, TileSize, FogRadius));
+        //player.AddComponent(new FogOfWarUpdaterComponent(fog, TileSize, FogRadius));
         player.AddComponent(new InventoryComponent()); 
         player.AddComponent(new ExitDetectorComponent(maze, TileSize, () => _sceneManager.Replace(new VictoryScene(_content, _graphics, _sceneManager))));
         player.AddComponent(new PauseTriggerComponent(() => _sceneManager.Push(new PauseScene(_content, _graphics, _sceneManager))));
@@ -102,13 +102,7 @@ public class GameScene : Scene
     private Entity CreatePatrol(Maze maze, MazeGenerator generator)
     {
         var sprite = _content.Load<Texture2D>("assets/sprite");
-
-        var waypoints = new List<Point>();
-        for (int j = 0; j < WaypointsPerPatrol; j++)
-        {
-            var position = generator.GetRandomFloorPosition();
-            waypoints.Add(new Point(position.X, position.Y));
-        }
+        var waypoints = generator.GetRandomRooms(WaypointsPerPatrol);
         var patrol = new Entity();
 
         patrol.AddComponent(new SpriteComponent(sprite));

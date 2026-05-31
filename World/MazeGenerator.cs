@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using System.Linq;
 
 namespace TryToEscape.World;
 
@@ -15,10 +16,6 @@ public class MazeGenerator
 
     public Maze Generate(int width, int height, int minSize, int minRoomSize, int padding)
     {
-        if (minSize - padding * 2 < minRoomSize + 1)
-            throw new ArgumentException(
-                "Комнаты не поместятся: увеличь minSize или уменьши padding/minRoomSize");
-
         _leaves = new();
         _minSize = minSize;
         _padding = padding;
@@ -54,6 +51,21 @@ public class MazeGenerator
         return new Point(room.Center.X, room.Center.Y);
     }
 
+    public IReadOnlyList<Point> GetRandomRooms(int count)
+    {
+        var startLeaf = GetLeftmostLeaf(_root);
+        var endLeaf = GetExitLeaf(_root);
+        var available = _leaves.Where(l => l != startLeaf && l != endLeaf).ToList();
+
+        for (int i = available.Count - 1; i > 0; i--)
+        {
+            int j = _rng.Next(i + 1);
+            (available[i], available[j]) = (available[j], available[i]);
+        }
+
+        return available.Take(count).Select(leaf => leaf.Room.Value.Center).ToList();
+    }
+
     public Vector2 GetStartPosition()
     {
         var node = GetLeftmostLeaf(_root);
@@ -83,9 +95,7 @@ public class MazeGenerator
         if (IsLeaf(node))
             return node;
 
-        var next = _rng.Next(0, 2) == 0 ? node.Right.Left : node.Right.Right;
-        if (next == null) return node.Right;
-            return GetExitLeaf(next);
+        return GetExitLeaf(node.Right);
     }
 
     private void Split(BSPNode node)
@@ -93,8 +103,16 @@ public class MazeGenerator
         if (!CanSplit(node))
             return;
         
-        var splitVertical = _rng.Next(0, 2) == 0;
+        
         var splitRatio = _rng.Next(40, 60) / 100f;
+        bool splitVertical;
+
+        if (node.Area.Width > node.Area.Height)
+            splitVertical = true;
+        else if (node.Area.Height > node.Area.Width)
+            splitVertical = false;
+        else
+            splitVertical = _rng.Next(0, 2) == 0;
 
         if (splitVertical)
             SplitVertical(node, splitRatio);

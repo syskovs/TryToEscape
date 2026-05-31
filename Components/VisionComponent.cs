@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using TryToEscape.Core;
 using TryToEscape.World;
 
@@ -13,14 +14,19 @@ public class VisionComponent : Component
     private int _radius;
     private float _halfAngleCos;
     private Action _onSpotted;
+    private float _gracePeriod;
+    private float _spotTimer = 0f;
+    private Texture2D _pixel;
 
-    public VisionComponent(Maze maze, Entity player, int tileSize, int radius, float halfAngleDegrees, Action onSpotted)
+    public VisionComponent(Maze maze, Entity player, int tileSize, int radius, float halfAngleDegrees, float gracePeriod, Texture2D pixel,Action onSpotted)
     {
         _maze = maze;
         _player = player;
         _tileSize = tileSize;
         _radius = radius;
         _onSpotted = onSpotted;
+        _gracePeriod = gracePeriod;
+        _pixel = pixel;
 
         var halfAngleRad = MathHelper.ToRadians(halfAngleDegrees);
         _halfAngleCos = (float)Math.Cos(halfAngleRad);
@@ -28,35 +34,74 @@ public class VisionComponent : Component
 
     public override void Update(GameTime gameTime)
     {
+        var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+        if (IsSpottingPlayer())
+        {
+            _spotTimer += dt;
+            if (_spotTimer >= _gracePeriod)
+                _onSpotted();
+        }
+        else
+        {
+            _spotTimer = 0f;
+        }
+    }
+
+    public override void Draw(SpriteBatch spriteBatch)
+    {
         var patrol = Owner.GetComponent<PatrolMovementComponent>();
         if (patrol == null) return;
 
         var facing = patrol.Facing;
         if (facing.LengthSquared() == 0) return;
 
-        var playerPos = _player.Position;
-        var patrolPos = Owner.Position;
+        var patrolTile = Owner.Position.ToTileCentered(_tileSize);
 
-        var patrolTilePos = patrolPos.ToTileCentered(_tileSize);
-        var playerTilePos = playerPos.ToTileCentered(_tileSize);
+        var alarm = MathHelper.Clamp(_spotTimer / _gracePeriod, 0f, 1f);
+        var color = Color.Lerp(Color.Yellow * 0.25f, Color.Red * 0.5f, alarm);
 
-        var toPlayer = playerPos - patrolPos;
-        var distance = toPlayer.Length();
-
-        if (distance == 0) 
+        for (int dx = -_radius; dx <= _radius; dx++)
+        for (int dy = -_radius; dy <= _radius; dy++)
         {
-            _onSpotted();
-            return;
+            var tile = new Point(patrolTile.X + dx, patrolTile.Y + dy);
+            if (!IsTileInView(tile, facing, patrolTile)) continue;
+
+            spriteBatch.Draw(_pixel,
+                new Rectangle(tile.X * _tileSize, tile.Y * _tileSize, _tileSize, _tileSize),
+                color);
         }
-        if (distance > _radius * _tileSize) return;
-        var dirToPlayer = toPlayer / distance;
+    }
 
-        var cos = Vector2.Dot(dirToPlayer, facing);
-        if (cos < _halfAngleCos) return; 
+    private bool IsSpottingPlayer()
+    {
+        var patrol = Owner.GetComponent<PatrolMovementComponent>();
+        if (patrol == null) return false;
 
-        if (!VisibilityCalculator.HasLineOfSight(_maze, playerTilePos.X, playerTilePos.Y, patrolTilePos.X, patrolTilePos.Y))
-            return;
+        var facing = patrol.Facing;
+        if (facing.LengthSquared() == 0) return false;
 
-        _onSpotted();
+        var patrolTile = Owner.Position.ToTileCentered(_tileSize);
+        var playerTile = _player.Position.ToTileCentered(_tileSize);
+
+        return IsTileInView(playerTile, facing, patrolTile);
+    }
+
+    private bool IsTileInView(Point tile, Vector2 facing, Point patrolTile)
+    {
+        var delta = (tile - patrolTile).ToVector2();
+        var distance = delta.Length();
+
+        if (distance == 0) return true;
+        if (distance > _radius) return false;
+
+        var direction = delta / distance;
+        var cos = Vector2.Dot(direction, facing);
+        if (cos < _halfAngleCos) return false;
+
+        if (!VisibilityCalculator.HasLineOfSight(_maze, patrolTile.X, patrolTile.Y, tile.X, tile.Y))
+            return false;
+
+        return true;
     }
 }

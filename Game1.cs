@@ -23,7 +23,11 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-        // TODO: Add your initialization logic here
+        Window.IsBorderless = true;
+        Window.Position = Point.Zero;
+        _graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
+        _graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
+        _graphics.ApplyChanges();
         _sceneManager = new SceneManager();
         _sceneManager.Replace(new MenuScene(Content, GraphicsDevice, _sceneManager));
         base.Initialize();

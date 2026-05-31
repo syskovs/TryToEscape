@@ -8,11 +8,13 @@ public class Camera
     private Vector2 _position;
     private int _width;
     private int _height;
+    private float _zoom;
 
-    public Camera(int width, int height)
+    public Camera(int width, int height, float zoom)
     {
         _width = width;
         _height = height;
+        _zoom = zoom;
     }
 
     public void Follow(Vector2 target)
@@ -22,17 +24,20 @@ public class Camera
 
     public Matrix GetTransformMatrix()
     {
-        return Matrix.CreateTranslation(-_position.X + _width / 2, -_position.Y + _height / 2, 0);
+        return Matrix.CreateTranslation(-_position.X, -_position.Y, 0) *
+           Matrix.CreateScale(_zoom) *
+           Matrix.CreateTranslation(_width / 2f, _height / 2f, 0);
     }
 
-    public Rectangle GetVisibleArea()
+    public Rectangle GetVisibleArea() 
     {
+        var w = (int)(_width / _zoom);
+        var h = (int)(_height / _zoom);
+
         return new Rectangle(
-            (int)(_position.X - _width  / 2f),
-            (int)(_position.Y - _height / 2f),
-            _width,
-            _height
-        );
+            (int)(_position.X - w / 2f),
+            (int)(_position.Y - h / 2f),
+            w, h);
     }
 
 }

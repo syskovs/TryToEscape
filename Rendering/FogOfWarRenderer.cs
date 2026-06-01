@@ -9,6 +9,7 @@ public class FogOfWarRenderer
     private FogOfWar _fog;
     private Texture2D _pixel;
     private int _tileSize;
+    private Color _color = new Color(0x25, 0x13, 0x1a);
 
 
     public FogOfWarRenderer(FogOfWar fog, Texture2D pixel, int tileSize)
@@ -35,7 +36,7 @@ public class FogOfWarRenderer
                     _ => 0f
                 };
 
-                spriteBatch.Draw(_pixel, new Rectangle(x * _tileSize, y * _tileSize, _tileSize, _tileSize), Color.Black * alpha);
+                spriteBatch.Draw(_pixel, new Rectangle(x * _tileSize, y * _tileSize, _tileSize, _tileSize), _color * alpha);
             }
     }
 }

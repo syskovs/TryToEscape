@@ -18,7 +18,7 @@ public class DefeatScene : Scene
         _graphics = graphics;
         _sceneManager = sceneManager;
 
-        var buttonSprite = content.Load<Texture2D>("assets/buttons/to_menu");
+        var buttonSprite = content.Load<Texture2D>("assets/buttons/btn_menu");
         
         var toMenuButton = new Entity();
         toMenuButton.AddComponent(new SpriteComponent(buttonSprite));

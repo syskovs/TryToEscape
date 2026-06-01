@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -11,14 +12,16 @@ public class MenuScene : Scene
     private ContentManager _content;
     private GraphicsDevice _graphics;
     private SceneManager _sceneManager;
+    private Texture2D _background;
 
     public MenuScene(ContentManager content, GraphicsDevice graphics, SceneManager sceneManager)
     {
         _content = content;
         _graphics = graphics;
         _sceneManager = sceneManager;
-
-        var buttonSprite = _content.Load<Texture2D>("assets/buttons/new_game");
+         
+        _background = content.Load<Texture2D>("assets/background");
+        var buttonSprite = _content.Load<Texture2D>("assets/buttons/btn_play");
         
         var newGameButton = new Entity();
         newGameButton.AddComponent(new SpriteComponent(buttonSprite));
@@ -30,11 +33,27 @@ public class MenuScene : Scene
             buttonSprite.Height,
             () => _sceneManager.Replace(new GameScene(_content, _graphics, _sceneManager))));
         AddEntity(newGameButton);
+
+        var exitSprite = _content.Load<Texture2D>("assets/buttons/btn_exit");
+        var exitButton = new Entity();
+
+        exitButton.AddComponent(new SpriteComponent(exitSprite));
+        exitButton.Position = new Vector2(
+            (_graphics.Viewport.Width  - exitSprite.Width)  / 2,
+            (_graphics.Viewport.Height - exitSprite.Height) / 2 + 450);
+        exitButton.AddComponent(new ButtonComponent(
+            exitSprite.Width, 
+            exitSprite.Height,
+            () => Environment.Exit(0)));
+        AddEntity(exitButton);
     }
 
     public override void Draw(SpriteBatch spriteBatch)
     {
         spriteBatch.Begin();
+        spriteBatch.Draw(_background, 
+            new Rectangle(0, 0, _graphics.Viewport.Width, _graphics.Viewport.Height), 
+            Color.White);
         base.Draw(spriteBatch);
         spriteBatch.End();
     }

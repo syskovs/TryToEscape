@@ -20,14 +20,14 @@ public class PauseScene : Scene
         _content = content;
 
 
-        var resumeSprite = content.Load<Texture2D>("assets/buttons/resume");
-        var toMenuSprite = content.Load<Texture2D>("assets/buttons/new_game");
+        var resumeSprite = content.Load<Texture2D>("assets/buttons/btn_resume");
+        var toMenuSprite = content.Load<Texture2D>("assets/buttons/btn_menu");
 
         var resumeButton = new Entity();
         resumeButton.AddComponent(new SpriteComponent(resumeSprite));
         resumeButton.Position = new Vector2(
-            (_graphics.Viewport.Width  - resumeSprite.Width)  / 2 + 100,
-            (_graphics.Viewport.Height - resumeSprite.Height) / 2 + 100);
+            (_graphics.Viewport.Width  - resumeSprite.Width)  / 2,
+            (_graphics.Viewport.Height - resumeSprite.Height) / 2);
         resumeButton.AddComponent(new ButtonComponent(
             resumeSprite.Width,
             resumeSprite.Height,
@@ -39,7 +39,7 @@ public class PauseScene : Scene
         toMenuButton.AddComponent(new SpriteComponent(toMenuSprite));
         toMenuButton.Position = new Vector2(
             (_graphics.Viewport.Width  - toMenuSprite.Width)  / 2,
-            (_graphics.Viewport.Height - toMenuSprite.Height) / 2);
+            (_graphics.Viewport.Height - toMenuSprite.Height) / 2 + 400);
         toMenuButton.AddComponent(new ButtonComponent(
             toMenuSprite.Width, 
             toMenuSprite.Height,

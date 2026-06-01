@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using TryToEscape.World;
@@ -7,18 +9,32 @@ namespace TryToEscape.Rendering;
 public class MazeRenderer
 {
     private Maze _maze;
-    private Texture2D _floor;
-    private Texture2D _wall;
-    private Texture2D _exit;
+    private Texture2D _atlas;
+    private Rectangle _exitRect;
+    private Dictionary<int, Rectangle[]> _wallRects;
+    private Dictionary<int, Rectangle[]> _floorRects;
+    private Rectangle _defaultFloorRect;
+    private Rectangle _defaultWallRect;
     private int _tileSize;
 
-    public MazeRenderer(Maze maze, Texture2D floor, Texture2D wall, Texture2D exit, int tileSize)
+    public MazeRenderer(
+        Maze maze,
+        Texture2D atlas,
+        Dictionary<int, Rectangle[]> floorRects,   // ← вместо одного
+        Rectangle defaultFloorRect,                 // ← новый
+        Dictionary<int, Rectangle[]> wallRects,
+        Rectangle defaultWallRect,
+        Rectangle exitRect,
+        int tileSize)
     {
         _maze = maze;
-        _floor = floor;
-        _wall = wall;
+        _atlas = atlas;
+        _wallRects = wallRects;
+        _floorRects = floorRects;
+        _defaultWallRect = defaultWallRect;
+        _defaultFloorRect = defaultFloorRect;
+        _exitRect = exitRect;
         _tileSize = tileSize;
-        _exit = exit;
     }
 
     public void Draw(SpriteBatch spriteBatch, Rectangle visibleArea)
@@ -28,14 +44,83 @@ public class MazeRenderer
         for (var x = bounds.Left; x < bounds.Right; x++)
             for (var y = bounds.Top; y < bounds.Bottom; y++)
             {
-                var tile = _maze.GetTile(x ,y);
+                var tile = _maze.GetTile(x, y);
+                var destRect = new Rectangle(x * _tileSize, y * _tileSize, _tileSize, _tileSize);
 
                 if (tile.Type == Tile.TileType.Floor)
-                    spriteBatch.Draw(_floor, new Rectangle(x * _tileSize, y * _tileSize, _tileSize, _tileSize), Color.White);
+                {
+                    var mask = ComputeFloorMask(x, y);
+                    var variants = _floorRects.GetValueOrDefault(mask);
+                    var rect = (variants == null || variants.Length == 0)
+                        ? _defaultFloorRect
+                        : variants[HashPosition(x, y) % variants.Length];
+
+                    spriteBatch.Draw(_atlas, destRect, rect, Color.White);
+                }
                 else if (tile.Type == Tile.TileType.Wall)
-                    spriteBatch.Draw(_wall, new Rectangle(x * _tileSize, y * _tileSize, _tileSize, _tileSize), Color.White);
+                {
+                    var mask = ComputeWallMask(x, y);
+                    var variants = _wallRects.GetValueOrDefault(mask);
+                    var rect = (variants == null || variants.Length == 0)
+                        ? _defaultWallRect
+                        : variants[HashPosition(x, y) % variants.Length];
+
+                    spriteBatch.Draw(_atlas, destRect, rect, Color.White);
+                }
                 else if (tile.Type == Tile.TileType.Exit)
-                    spriteBatch.Draw(_exit, new Rectangle(x * _tileSize, y * _tileSize, _tileSize, _tileSize), Color.White);
+                {
+                    spriteBatch.Draw(_atlas, destRect, _exitRect, Color.White);
+                }
             }
+    }
+
+    private int ComputeFloorMask(int x, int y)
+    {
+        int mask = 0;
+        if (IsWallInBounds(x,   y-1)) mask |= 1;   // стена сверху → пол на верхней границе
+        if (IsWallInBounds(x+1, y))   mask |= 2;   // стена справа
+        if (IsWallInBounds(x,   y+1)) mask |= 4;   // стена снизу
+        if (IsWallInBounds(x-1, y))   mask |= 8;   // стена слева
+        return mask;
+    }
+
+    private bool IsWallInBounds(int x, int y)
+    {
+        if (x < 0 || x >= _maze.Width || y < 0 || y >= _maze.Height)
+            return false;   // вне карты — не стена для целей autotile
+        return _maze.GetTile(x, y).Type == Tile.TileType.Wall;
+    }
+    private int ComputeWallMask(int x, int y)
+    {
+        bool floorN = IsFloorInBounds(x,   y-1);
+        bool floorE = IsFloorInBounds(x+1, y);
+        bool floorS = IsFloorInBounds(x,   y+1);
+        bool floorW = IsFloorInBounds(x-1, y);
+
+        int cardinal = 0;
+        if (floorN) cardinal |= 1;
+        if (floorE) cardinal |= 2;
+        if (floorS) cardinal |= 4;
+        if (floorW) cardinal |= 8;
+        if (cardinal != 0) return cardinal;
+
+        if (IsFloorInBounds(x-1, y+1)) return 16;/* код угла "пол SW" */;
+        if (IsFloorInBounds(x+1, y+1)) return 17;/* код угла "пол SE" */;
+        if (IsFloorInBounds(x-1, y-1)) return 18;/* код угла "пол NW" */;
+        if (IsFloorInBounds(x+1, y-1)) return 19;/* код угла "пол NE" */;
+
+        return 0;
+    }
+
+    private bool IsFloorInBounds(int x, int y)
+    {
+        if (x < 0 || x >= _maze.Width || y < 0 || y >= _maze.Height)
+            return false;
+        return _maze.GetTile(x, y).Type != Tile.TileType.Wall;
+    }
+
+    private int HashPosition(int x, int y)
+    {
+        return Math.Abs(x * 73 + y * 17);
     }
 }

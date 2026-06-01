@@ -13,6 +13,7 @@ public class Game1 : Game
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
     private SceneManager _sceneManager;
+    private Color _color = new Color(0x25, 0x13, 0x1a);
 
     public Game1()
     {
@@ -48,7 +49,7 @@ public class Game1 : Game
 
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(Color.CornflowerBlue);
+        GraphicsDevice.Clear(_color);
         _sceneManager.Draw(_spriteBatch);
         base.Draw(gameTime);
     }

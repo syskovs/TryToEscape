@@ -21,10 +21,10 @@ public class GameScene : Scene
     private Texture2D _pixel;
 
     private const int TileSize = 16;
-    private const int PatrolCount = 2;
+    private const int PatrolCount = 10;
     private const int WaypointsPerPatrol = 3;
     private const int PlayerSpeed = 150;
-    private const int FogRadius = 8;
+    private const int FogRadius = 6;
     private const int PatrolVisionRadius = 8;
     private const int PatrolSpeed = 60;
     private const int PatrolVisionAngle = 30;
@@ -67,8 +67,8 @@ public class GameScene : Scene
 
         InitializeRenderers(maze, fog);
         CreatePlayer(maze, generator, fog);
-        CreateKey(generator);
-        CreatePatrols(maze, generator);
+        CreateKey(generator, fog);
+        CreatePatrols(maze, generator, fog);
     }
 
     private void InitializeRenderers(Maze maze, FogOfWar fog)
@@ -254,13 +254,14 @@ public class GameScene : Scene
         _player = player;
     }
 
-    private Entity CreatePatrol(Maze maze, MazeGenerator generator)
+    private Entity CreatePatrol(Maze maze, MazeGenerator generator, FogOfWar fog)
     {
         var sprite = _content.Load<Texture2D>("assets/skeleton");
         var waypoints = generator.GetRandomRooms(WaypointsPerPatrol);
         var patrol = new Entity();
 
         patrol.AddComponent(new AnimatedSpriteComponent(sprite, 16, 16, 4, 0.12f, true));
+        patrol.AddComponent(new FogVisibilityComponent(fog, TileSize));
         patrol.AddComponent(new VisionComponent(
             maze, _player, TileSize, PatrolVisionRadius, PatrolVisionAngle, GracePeriod, _pixel,
             () => _sceneManager.Replace(new DefeatScene(_content, _graphics, _sceneManager))));
@@ -270,13 +271,13 @@ public class GameScene : Scene
         return patrol;
     }
 
-    private void CreatePatrols(Maze maze, MazeGenerator generator)
+    private void CreatePatrols(Maze maze, MazeGenerator generator, FogOfWar fog)
     {
         for (int i = 0; i < PatrolCount; i++)
-            AddEntity(CreatePatrol(maze, generator));
+            AddEntity(CreatePatrol(maze, generator, fog));
     }
 
-    private void CreateKey(MazeGenerator generator)
+    private void CreateKey(MazeGenerator generator, FogOfWar fog)
     {
         var position = generator.GetRandomFloorPosition();
         var key = new Entity();
@@ -286,6 +287,7 @@ public class GameScene : Scene
             frameWidth: 16, frameHeight: 16, 
             frameCount: 4, 
             frameDuration: 0.15f));
+        key.AddComponent(new FogVisibilityComponent(fog, TileSize));
         key.Position = position.ToPixel(TileSize);
         key.AddComponent(new KeyComponent(_player, this, TileSize));
 

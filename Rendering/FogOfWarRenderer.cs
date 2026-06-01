@@ -32,7 +32,7 @@ public class FogOfWarRenderer
 
                 var alpha = state switch {
                     FogOfWar.State.Hidden => 1f,
-                    FogOfWar.State.Explored => 0.6f,
+                    FogOfWar.State.Explored => 1f,
                     _ => 0f
                 };
 

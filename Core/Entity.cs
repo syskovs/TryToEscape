@@ -8,6 +8,7 @@ public class Entity
 {
     readonly List<Component> _components = new();
     public Vector2 Position;
+    public bool Visible { get; set; } = true;
 
     public void AddComponent(Component component)
     {
@@ -37,6 +38,8 @@ public class Entity
 
     public void Draw(SpriteBatch spriteBatch)
     {
+        if (!Visible) return;
+        
         foreach (var c in _components)
             c.Draw(spriteBatch);
     }

@@ -29,8 +29,10 @@ public class Game1 : Game
         _graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
         _graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
         _graphics.ApplyChanges();
+        
         _sceneManager = new SceneManager();
-        _sceneManager.Replace(new MenuScene(Content, GraphicsDevice, _sceneManager));
+        var context = new GameContext(Content, GraphicsDevice, _sceneManager);
+        _sceneManager.Replace(new MenuScene(context));
         base.Initialize();
     }
 

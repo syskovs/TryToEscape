@@ -15,7 +15,7 @@ public static class Pathfinder
         new Point(1, 0)
     };
 
-    public static IReadOnlyList<Point> FindPath(Maze maze, Point start, Point end)
+    public static List<Point> FindPath(Maze maze, Point start, Point end)
     {
         var queue = new Queue<Point>();
         var cameFrom = new Dictionary<Point, Point>();

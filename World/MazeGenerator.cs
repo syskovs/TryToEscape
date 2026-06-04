@@ -51,7 +51,7 @@ public class MazeGenerator
         return new Point(room.Center.X, room.Center.Y);
     }
 
-    public IReadOnlyList<Point> GetRandomRooms(int count)
+    public List<Point> GetRandomRooms(int count)
     {
         var startLeaf = GetLeftmostLeaf(_root);
         var endLeaf = GetExitLeaf(_root);

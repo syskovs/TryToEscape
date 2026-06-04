@@ -19,8 +19,8 @@ public static class GameConfig
     public const int PatrolSpeed = 60;
     public const int PatrolVisionAngle = 60;
     public const float GracePeriod = 0f;
-    public const int PatrolChaseSpeed = 100;
+    public const int PatrolChaseSpeed = 60;
 
-    public const int KeyCount = 4;
-    public const int KeyToExit = 4;
+    public const int KeyCount = 3;
+    public const int KeyToExit = 3;
 }

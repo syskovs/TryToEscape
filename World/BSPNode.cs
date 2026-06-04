@@ -6,8 +6,8 @@ public class BSPNode
 {
     public Rectangle Area;
     public Rectangle? Room;
-    public BSPNode? Left;
-    public BSPNode? Right;
+    public BSPNode Left;
+    public BSPNode Right;
 
     public BSPNode(Rectangle area)
     {

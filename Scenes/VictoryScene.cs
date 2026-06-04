@@ -1,36 +1,32 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using TryToEscape.Components;
+using TryToEscape.Config;
 using TryToEscape.Core;
 
 namespace TryToEscape.Scenes;
 
 public class VictoryScene : Scene
 {
-    private ContentManager _content;
-    private GraphicsDevice _graphics;
-    private SceneManager _sceneManager;
     private Texture2D _background;
+    private GameContext _context;
 
-    public VictoryScene(ContentManager content, GraphicsDevice graphics, SceneManager sceneManager)
+    public VictoryScene(GameContext context)
     {
-        _content = content;
-        _graphics = graphics;
-        _sceneManager = sceneManager;
+        _context = context;
 
-        _background = content.Load<Texture2D>("assets/scenes/backgrounds/victory");
-        var buttonSprite = content.Load<Texture2D>("assets/scenes/buttons/menu");
+        _background = _context.Content.Load<Texture2D>(Assets.VictoryBackground);
+        var buttonSprite = _context.Content.Load<Texture2D>(Assets.MenuButton);
         
         var toMenuButton = new Entity();
         toMenuButton.AddComponent(new SpriteComponent(buttonSprite));
         toMenuButton.Position = new Vector2(
-            (_graphics.Viewport.Width  - buttonSprite.Width)  / 2,
-            (_graphics.Viewport.Height - buttonSprite.Height) / 2 + 200);
+            (_context.Graphics.Viewport.Width  - buttonSprite.Width)  / 2,
+            (_context.Graphics.Viewport.Height - buttonSprite.Height) / 2 + 200);
         toMenuButton.AddComponent(new ButtonComponent(
             buttonSprite.Width, 
             buttonSprite.Height,
-            () => _sceneManager.Replace(new MenuScene(_content, _graphics, _sceneManager))));
+            () => _context.Scenes.Replace(new MenuScene(_context))));
         AddEntity(toMenuButton);
     }
 
@@ -38,7 +34,7 @@ public class VictoryScene : Scene
     {
         spriteBatch.Begin();
         spriteBatch.Draw(_background, 
-            new Rectangle(0, 0, _graphics.Viewport.Width, _graphics.Viewport.Height), 
+            new Rectangle(0, 0, _context.Graphics.Viewport.Width, _context.Graphics.Viewport.Height), 
             Color.White);
         base.Draw(spriteBatch);
         spriteBatch.End();

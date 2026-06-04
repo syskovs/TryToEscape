@@ -1,46 +1,42 @@
 using System;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using TryToEscape.Components;
+using TryToEscape.Config;
 using TryToEscape.Core;
 
 namespace TryToEscape.Scenes;
 
 public class MenuScene : Scene
 {
-    private ContentManager _content;
-    private GraphicsDevice _graphics;
-    private SceneManager _sceneManager;
     private Texture2D _background;
+    private GameContext _context;
 
-    public MenuScene(ContentManager content, GraphicsDevice graphics, SceneManager sceneManager)
+    public MenuScene(GameContext context)
     {
-        _content = content;
-        _graphics = graphics;
-        _sceneManager = sceneManager;
+        _context = context;
          
-        _background = content.Load<Texture2D>("assets/scenes/backgrounds/menu");
-        var buttonSprite = _content.Load<Texture2D>("assets/scenes/buttons/play");
+        _background = _context.Content.Load<Texture2D>(Assets.MenuBackground);
+        var buttonSprite = _context.Content.Load<Texture2D>(Assets.PlayButton);
         
         var newGameButton = new Entity();
         newGameButton.AddComponent(new SpriteComponent(buttonSprite));
         newGameButton.Position = new Vector2(
-            (_graphics.Viewport.Width  - buttonSprite.Width)  / 2,
-            (_graphics.Viewport.Height - buttonSprite.Height) / 2);
+            (_context.Graphics.Viewport.Width  - buttonSprite.Width)  / 2,
+            (_context.Graphics.Viewport.Height - buttonSprite.Height) / 2);
         newGameButton.AddComponent(new ButtonComponent(
             buttonSprite.Width, 
             buttonSprite.Height,
-            () => _sceneManager.Replace(new GameScene(_content, _graphics, _sceneManager))));
+            () => _context.Scenes.Replace(new GameScene(_context))));
         AddEntity(newGameButton);
 
-        var exitSprite = _content.Load<Texture2D>("assets/scenes/buttons/exit");
+        var exitSprite = _context.Content.Load<Texture2D>(Assets.ExitButton);
         var exitButton = new Entity();
 
         exitButton.AddComponent(new SpriteComponent(exitSprite));
         exitButton.Position = new Vector2(
-            (_graphics.Viewport.Width  - exitSprite.Width)  / 2,
-            (_graphics.Viewport.Height - exitSprite.Height) / 2 + 450);
+            (_context.Graphics.Viewport.Width  - exitSprite.Width)  / 2,
+            (_context.Graphics.Viewport.Height - exitSprite.Height) / 2 + 450);
         exitButton.AddComponent(new ButtonComponent(
             exitSprite.Width, 
             exitSprite.Height,
@@ -52,7 +48,7 @@ public class MenuScene : Scene
     {
         spriteBatch.Begin();
         spriteBatch.Draw(_background, 
-            new Rectangle(0, 0, _graphics.Viewport.Width, _graphics.Viewport.Height), 
+            new Rectangle(0, 0, _context.Graphics.Viewport.Width, _context.Graphics.Viewport.Height), 
             Color.White);
         base.Draw(spriteBatch);
         spriteBatch.End();

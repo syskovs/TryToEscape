@@ -18,7 +18,7 @@ public class PatrolMovementComponent : Component
     private bool _initialized;
     private int _waypointIndex;
     private int _waypointDirection = 1;
-    private IReadOnlyList<Point> _currentPath;
+    private List<Point> _currentPath;
     private int _pathIndex;
     private State _state;
 
@@ -29,7 +29,7 @@ public class PatrolMovementComponent : Component
     
     public enum State
     {
-        Default,
+        Patrolling,
         Chasing
     }
 
@@ -72,9 +72,9 @@ public class PatrolMovementComponent : Component
     {
         if (_state == State.Chasing)
         {
-            _state = State.Default;
+            _state = State.Patrolling;
             _chaseTarget = null;
-            RecalculatePath();
+             RecalculatePatrolPath();
             _pathIndex = 0;
         }
     }
@@ -83,47 +83,38 @@ public class PatrolMovementComponent : Component
     {
         if (_waypoints.Count < 2) return;
         if (!_initialized) { InitFirstPath(); _initialized = true; }
+        if (_currentPath == null || _currentPath.Count == 0) return;
 
         var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-        if (_currentPath == null || _pathIndex >= _currentPath.Count)
-        {
-            if (_state == State.Chasing)
-                RecalculateChasePathFromHere();
-            else
-            {
-                AdvanceWaypoint();
-                RecalculatePath();
-            }
-            _pathIndex = _currentPath.Count > 1 ? 1 : 0;
-            if (_currentPath.Count == 0) return;
-        }
-
         var target = _currentPath[_pathIndex].ToPixel(_tileSize);
-        var currentSpeed = _state == State.Chasing ? _chaseSpeed : _speed;
-        MoveToward(target, dt, currentSpeed);
+        var speed = _state == State.Chasing ? _chaseSpeed : _speed;
+        MoveToward(target, dt, speed);
 
         if (Owner.Position == target)
-        {
-            _pathIndex++;
+            AdvanceToNextTile();
 
-            if (_state == State.Chasing)
-            {
-                RecalculateChasePathFromHere();
-                _pathIndex = _currentPath.Count > 1 ? 1 : 0;
-            }
-        }
+        CheckCatch();
+    }
 
-        if (_state == State.Chasing && _chaseTarget != null)
+    private void AdvanceToNextTile()
+    {
+        _pathIndex++;
+        if (_pathIndex >= _currentPath.Count)
         {
-            var myTile = Owner.Position.ToTile(_tileSize);
-            var targetTile = _chaseTarget.Position.ToTile(_tileSize);
-            if (Vector2.Distance(Owner.Position, _chaseTarget.Position) < _tileSize)
-                _onCatch?.Invoke();
+            if (_state == State.Chasing) RecalculateChasePath();
+            else { AdvanceWaypoint();  RecalculatePatrolPath(); }
+            _pathIndex = _currentPath.Count > 1 ? 1 : 0;
         }
     }
 
-    private void RecalculateChasePathFromHere()
+    private void CheckCatch()
+    {
+        if (_state != State.Chasing || _chaseTarget == null) return;
+        if (Vector2.Distance(Owner.Position, _chaseTarget.Position) < _tileSize)
+            _onCatch?.Invoke();
+    }
+
+    private void RecalculateChasePath()
     {
         if (_chaseTarget == null) return;
         var fromTile = Owner.Position.ToTile(_tileSize);
@@ -153,7 +144,7 @@ public class PatrolMovementComponent : Component
     {
         _waypointIndex = 0;
         _waypointDirection = 1;
-        RecalculatePath();
+         RecalculatePatrolPath();
         _pathIndex = 0;
     }
 
@@ -172,7 +163,7 @@ public class PatrolMovementComponent : Component
         }
     }
 
-    private void RecalculatePath()
+    private void  RecalculatePatrolPath()
     {
         var fromTile = Owner.Position.ToTile(_tileSize);
         var toTile = _waypoints[_waypointIndex];

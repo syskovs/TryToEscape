@@ -13,18 +13,16 @@ public class VisionComponent : Component
     private int _tileSize;
     private int _radius;
     private float _halfAngleCos;
-    private Action _onSpotted;
     private float _gracePeriod;
     private float _spotTimer = 0f;
     private Texture2D _pixel;
 
-    public VisionComponent(Maze maze, Entity player, int tileSize, int radius, float halfAngleDegrees, float gracePeriod, Texture2D pixel,Action onSpotted)
+    public VisionComponent(Maze maze, Entity player, int tileSize, int radius, float halfAngleDegrees, float gracePeriod, Texture2D pixel)
     {
         _maze = maze;
         _player = player;
         _tileSize = tileSize;
         _radius = radius;
-        _onSpotted = onSpotted;
         _gracePeriod = gracePeriod;
         _pixel = pixel;
 
@@ -61,8 +59,6 @@ public class VisionComponent : Component
 
         var patrolTile = Owner.Position.ToTileCentered(_tileSize);
 
-        
-
         for (int dx = -_radius; dx <= _radius; dx++)
         for (int dy = -_radius; dy <= _radius; dy++)
         {
@@ -70,7 +66,8 @@ public class VisionComponent : Component
             if (!IsTileInView(tile, facing, patrolTile)) continue;
 
             spriteBatch.Draw(_pixel,
-                new Rectangle(tile.X * _tileSize, tile.Y * _tileSize, _tileSize, _tileSize), Color.White * 0f);
+                new Rectangle(tile.X * _tileSize, tile.Y * _tileSize, _tileSize, _tileSize),
+                Color.White * 0.05f);
         }
     }
 

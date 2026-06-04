@@ -11,6 +11,7 @@ public class VictoryScene : Scene
     private ContentManager _content;
     private GraphicsDevice _graphics;
     private SceneManager _sceneManager;
+    private Texture2D _background;
 
     public VictoryScene(ContentManager content, GraphicsDevice graphics, SceneManager sceneManager)
     {
@@ -18,13 +19,14 @@ public class VictoryScene : Scene
         _graphics = graphics;
         _sceneManager = sceneManager;
 
-        var buttonSprite = content.Load<Texture2D>("assets/buttons/btn_menu");
+        _background = content.Load<Texture2D>("assets/scenes/backgrounds/victory");
+        var buttonSprite = content.Load<Texture2D>("assets/scenes/buttons/menu");
         
         var toMenuButton = new Entity();
         toMenuButton.AddComponent(new SpriteComponent(buttonSprite));
         toMenuButton.Position = new Vector2(
             (_graphics.Viewport.Width  - buttonSprite.Width)  / 2,
-            (_graphics.Viewport.Height - buttonSprite.Height) / 2);
+            (_graphics.Viewport.Height - buttonSprite.Height) / 2 + 200);
         toMenuButton.AddComponent(new ButtonComponent(
             buttonSprite.Width, 
             buttonSprite.Height,
@@ -35,6 +37,9 @@ public class VictoryScene : Scene
     public override void Draw(SpriteBatch spriteBatch)
     {
         spriteBatch.Begin();
+        spriteBatch.Draw(_background, 
+            new Rectangle(0, 0, _graphics.Viewport.Width, _graphics.Viewport.Height), 
+            Color.White);
         base.Draw(spriteBatch);
         spriteBatch.End();
     }

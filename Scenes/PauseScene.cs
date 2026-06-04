@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,6 +13,7 @@ public class PauseScene : Scene
     private Texture2D _pixel;
     private GraphicsDevice _graphics;
     private ContentManager _content;
+    private Texture2D _background;
 
     public PauseScene(ContentManager content, GraphicsDevice graphics, SceneManager sceneManager)
     {
@@ -19,9 +21,10 @@ public class PauseScene : Scene
         _sceneManager = sceneManager;
         _content = content;
 
+        _background = content.Load<Texture2D>("assets/scenes/backgrounds/pause");
 
-        var resumeSprite = content.Load<Texture2D>("assets/buttons/btn_resume");
-        var toMenuSprite = content.Load<Texture2D>("assets/buttons/btn_menu");
+        var resumeSprite = content.Load<Texture2D>("assets/scenes/buttons/resume");
+        var toMenuSprite = content.Load<Texture2D>("assets/scenes/buttons/menu");
 
         var resumeButton = new Entity();
         resumeButton.AddComponent(new SpriteComponent(resumeSprite));
@@ -57,9 +60,14 @@ public class PauseScene : Scene
     public override void Draw(SpriteBatch spriteBatch)
     {
         spriteBatch.Begin();
+        
         spriteBatch.Draw(_pixel, 
             new Rectangle(0, 0, _graphics.Viewport.Width, _graphics.Viewport.Height), 
             Color.Black * 0.5f);
+
+        spriteBatch.Draw(_background,
+            new Rectangle((_graphics.Viewport.Width  - _background.Width)  / 2, 100, _background.Width, _background.Height), 
+            Color.White);
         base.Draw(spriteBatch);
         spriteBatch.End();
     }

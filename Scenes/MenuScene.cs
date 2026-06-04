@@ -20,8 +20,8 @@ public class MenuScene : Scene
         _graphics = graphics;
         _sceneManager = sceneManager;
          
-        _background = content.Load<Texture2D>("assets/background");
-        var buttonSprite = _content.Load<Texture2D>("assets/buttons/btn_play");
+        _background = content.Load<Texture2D>("assets/scenes/backgrounds/menu");
+        var buttonSprite = _content.Load<Texture2D>("assets/scenes/buttons/play");
         
         var newGameButton = new Entity();
         newGameButton.AddComponent(new SpriteComponent(buttonSprite));
@@ -34,7 +34,7 @@ public class MenuScene : Scene
             () => _sceneManager.Replace(new GameScene(_content, _graphics, _sceneManager))));
         AddEntity(newGameButton);
 
-        var exitSprite = _content.Load<Texture2D>("assets/buttons/btn_exit");
+        var exitSprite = _content.Load<Texture2D>("assets/scenes/buttons/exit");
         var exitButton = new Entity();
 
         exitButton.AddComponent(new SpriteComponent(exitSprite));

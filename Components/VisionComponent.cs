@@ -39,12 +39,15 @@ public class VisionComponent : Component
         if (IsSpottingPlayer())
         {
             _spotTimer += dt;
+            var patrol = Owner.GetComponent<PatrolMovementComponent>();
             if (_spotTimer >= _gracePeriod)
-                _onSpotted();
+                patrol?.StartChasing(_player);
         }
         else
         {
             _spotTimer = 0f;
+            var patrol = Owner.GetComponent<PatrolMovementComponent>();
+            patrol?.StopChasing();
         }
     }
 
@@ -58,8 +61,7 @@ public class VisionComponent : Component
 
         var patrolTile = Owner.Position.ToTileCentered(_tileSize);
 
-        var alarm = MathHelper.Clamp(_spotTimer / _gracePeriod, 0f, 1f);
-        var color = Color.Lerp(Color.Yellow * 0.25f, Color.Red * 0.5f, alarm);
+        
 
         for (int dx = -_radius; dx <= _radius; dx++)
         for (int dy = -_radius; dy <= _radius; dy++)
@@ -68,8 +70,7 @@ public class VisionComponent : Component
             if (!IsTileInView(tile, facing, patrolTile)) continue;
 
             spriteBatch.Draw(_pixel,
-                new Rectangle(tile.X * _tileSize, tile.Y * _tileSize, _tileSize, _tileSize),
-                color);
+                new Rectangle(tile.X * _tileSize, tile.Y * _tileSize, _tileSize, _tileSize), Color.White * 0f);
         }
     }
 

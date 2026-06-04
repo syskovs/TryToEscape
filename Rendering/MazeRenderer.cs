@@ -20,8 +20,8 @@ public class MazeRenderer
     public MazeRenderer(
         Maze maze,
         Texture2D atlas,
-        Dictionary<int, Rectangle[]> floorRects,   // ← вместо одного
-        Rectangle defaultFloorRect,                 // ← новый
+        Dictionary<int, Rectangle[]> floorRects,
+        Rectangle defaultFloorRect,
         Dictionary<int, Rectangle[]> wallRects,
         Rectangle defaultWallRect,
         Rectangle exitRect,
@@ -77,17 +77,17 @@ public class MazeRenderer
     private int ComputeFloorMask(int x, int y)
     {
         int mask = 0;
-        if (IsWallInBounds(x,   y-1)) mask |= 1;   // стена сверху → пол на верхней границе
-        if (IsWallInBounds(x+1, y))   mask |= 2;   // стена справа
-        if (IsWallInBounds(x,   y+1)) mask |= 4;   // стена снизу
-        if (IsWallInBounds(x-1, y))   mask |= 8;   // стена слева
+        if (IsWallInBounds(x,   y-1)) mask |= 1;
+        if (IsWallInBounds(x+1, y))   mask |= 2;
+        if (IsWallInBounds(x,   y+1)) mask |= 4;
+        if (IsWallInBounds(x-1, y))   mask |= 8;
         return mask;
     }
 
     private bool IsWallInBounds(int x, int y)
     {
         if (x < 0 || x >= _maze.Width || y < 0 || y >= _maze.Height)
-            return false;   // вне карты — не стена для целей autotile
+            return false;
         return _maze.GetTile(x, y).Type == Tile.TileType.Wall;
     }
     private int ComputeWallMask(int x, int y)
@@ -104,10 +104,10 @@ public class MazeRenderer
         if (floorW) cardinal |= 8;
         if (cardinal != 0) return cardinal;
 
-        if (IsFloorInBounds(x-1, y+1)) return 16;/* код угла "пол SW" */;
-        if (IsFloorInBounds(x+1, y+1)) return 17;/* код угла "пол SE" */;
-        if (IsFloorInBounds(x-1, y-1)) return 18;/* код угла "пол NW" */;
-        if (IsFloorInBounds(x+1, y-1)) return 19;/* код угла "пол NE" */;
+        if (IsFloorInBounds(x-1, y+1)) return 16;
+        if (IsFloorInBounds(x+1, y+1)) return 17;
+        if (IsFloorInBounds(x-1, y-1)) return 18;
+        if (IsFloorInBounds(x+1, y-1)) return 19;
 
         return 0;
     }

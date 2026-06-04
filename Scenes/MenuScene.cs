@@ -17,29 +17,28 @@ public class MenuScene : Scene
         _context = context;
          
         _background = _context.Content.Load<Texture2D>(Assets.MenuBackground);
-        var buttonSprite = _context.Content.Load<Texture2D>(Assets.PlayButton);
+        var playButtonSprite = _context.Content.Load<Texture2D>(Assets.PlayButton);
+        var exitButtonSprite = _context.Content.Load<Texture2D>(Assets.ExitButton);
         
-        var newGameButton = new Entity();
-        newGameButton.AddComponent(new SpriteComponent(buttonSprite));
-        newGameButton.Position = new Vector2(
-            (_context.Graphics.Viewport.Width  - buttonSprite.Width)  / 2,
-            (_context.Graphics.Viewport.Height - buttonSprite.Height) / 2);
-        newGameButton.AddComponent(new ButtonComponent(
-            buttonSprite.Width, 
-            buttonSprite.Height,
+        var playButton = new Entity();
+        playButton.AddComponent(new SpriteComponent(playButtonSprite));
+        playButton.Position = new Vector2(
+            (_context.Graphics.Viewport.Width  - playButtonSprite.Width)  / 2,
+            (_context.Graphics.Viewport.Height - playButtonSprite.Height) / 2);
+        playButton.AddComponent(new ButtonComponent(
+            playButtonSprite.Width, 
+            playButtonSprite.Height,
             () => _context.Scenes.Replace(new GameScene(_context))));
-        AddEntity(newGameButton);
+        AddEntity(playButton);
 
-        var exitSprite = _context.Content.Load<Texture2D>(Assets.ExitButton);
         var exitButton = new Entity();
-
-        exitButton.AddComponent(new SpriteComponent(exitSprite));
+        exitButton.AddComponent(new SpriteComponent(exitButtonSprite));
         exitButton.Position = new Vector2(
-            (_context.Graphics.Viewport.Width  - exitSprite.Width)  / 2,
-            (_context.Graphics.Viewport.Height - exitSprite.Height) / 2 + 450);
+            (_context.Graphics.Viewport.Width  - exitButtonSprite.Width)  / 2,
+            (_context.Graphics.Viewport.Height - exitButtonSprite.Height) / 2 + _context.Graphics.Viewport.Height / 4);
         exitButton.AddComponent(new ButtonComponent(
-            exitSprite.Width, 
-            exitSprite.Height,
+            exitButtonSprite.Width, 
+            exitButtonSprite.Height,
             () => Environment.Exit(0)));
         AddEntity(exitButton);
     }

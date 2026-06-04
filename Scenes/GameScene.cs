@@ -17,10 +17,10 @@ public class GameScene : Scene
     private SpriteFont _hudFont;
     private readonly GameContext _context;
 
-    public GameScene(GameContext ctx)
+    public GameScene(GameContext context)
     {
-        _context = ctx;
-        _camera = new Camera(ctx.Graphics.Viewport.Width, ctx.Graphics.Viewport.Height, GameConfig.Zoom);
+        _context = context;
+        _camera = new Camera(context.Graphics.Viewport.Width, context.Graphics.Viewport.Height, GameConfig.Zoom);
         InitializeScene();
     }
 

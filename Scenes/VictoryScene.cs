@@ -16,18 +16,18 @@ public class VictoryScene : Scene
         _context = context;
 
         _background = _context.Content.Load<Texture2D>(Assets.VictoryBackground);
-        var buttonSprite = _context.Content.Load<Texture2D>(Assets.MenuButton);
+        var menuButtonSprite = _context.Content.Load<Texture2D>(Assets.MenuButton);
         
-        var toMenuButton = new Entity();
-        toMenuButton.AddComponent(new SpriteComponent(buttonSprite));
-        toMenuButton.Position = new Vector2(
-            (_context.Graphics.Viewport.Width  - buttonSprite.Width)  / 2,
-            (_context.Graphics.Viewport.Height - buttonSprite.Height) / 2 + 200);
-        toMenuButton.AddComponent(new ButtonComponent(
-            buttonSprite.Width, 
-            buttonSprite.Height,
+        var menuButton = new Entity();
+        menuButton.AddComponent(new SpriteComponent(menuButtonSprite));
+        menuButton.Position = new Vector2(
+            (_context.Graphics.Viewport.Width  - menuButtonSprite.Width)  / 2,
+            (_context.Graphics.Viewport.Height - menuButtonSprite.Height) / 2 + _context.Graphics.Viewport.Height / 8);
+        menuButton.AddComponent(new ButtonComponent(
+            menuButtonSprite.Width, 
+            menuButtonSprite.Height,
             () => _context.Scenes.Replace(new MenuScene(_context))));
-        AddEntity(toMenuButton);
+        AddEntity(menuButton);
     }
 
     public override void Draw(SpriteBatch spriteBatch)

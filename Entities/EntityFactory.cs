@@ -50,7 +50,7 @@ public class EntityFactory
         var patrol = new Entity();
 
         patrol.Position = waypoints[0].ToPixel(GameConfig.TileSize);
-        patrol.AddComponent(new AnimatedSpriteComponent(sprite, 16, 16, 4, 0.12f, pauseWhenStill: true));
+        patrol.AddComponent(new AnimatedSpriteComponent(sprite, 16, 16, 4, 0.12f, true));
         patrol.AddComponent(new PatrolIndicatorComponent(indicatorSheet, 16, 16, 4, 0.15f, new Vector2(0, -16)));
         patrol.AddComponent(new FogVisibilityComponent(fog, GameConfig.TileSize));
         patrol.AddComponent(new VisionComponent(
@@ -78,7 +78,7 @@ public class EntityFactory
         var key = new Entity();
 
         key.Position = tile.ToPixel(GameConfig.TileSize);
-        key.AddComponent(new AnimatedSpriteComponent(sprite, 16, 16, 4, 0.15f));
+        key.AddComponent(new AnimatedSpriteComponent(sprite, 16, 16, 4, 0.12f));
         key.AddComponent(new FogVisibilityComponent(fog, GameConfig.TileSize));
         key.AddComponent(new KeyComponent(player, scene, GameConfig.TileSize));
 

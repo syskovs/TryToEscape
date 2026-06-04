@@ -1,9 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using TryToEscape.Core;
-using TryToEscape.Rendering;
 using TryToEscape.Scenes;
 
 namespace TryToEscape;
